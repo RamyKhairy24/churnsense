@@ -1,31 +1,31 @@
-const CACHE = 'churnsense-v2';
-const OFFLINE_URL = '/';
+const CACHE = 'churnsense-v3';
 
-// On install: cache the shell
+// On install: skip waiting immediately — don't pre-cache anything
 self.addEventListener('install', event => {
-  event.waitUntil(
-    caches.open(CACHE).then(cache => cache.add(OFFLINE_URL))
-  );
   self.skipWaiting();
 });
 
-// On activate: clean up old caches
+// On activate: clean up old caches, claim clients right away
 self.addEventListener('activate', event => {
   event.waitUntil(
     caches.keys().then(keys =>
       Promise.all(keys.filter(k => k !== CACHE).map(k => caches.delete(k)))
-    )
+    ).then(() => self.clients.claim())
   );
-  self.clients.claim();
 });
 
-// Network-first for API, cache-first for everything else
+// Fetch strategy:
+//   - HTML pages → always network, never cache
+//   - /predict API → always network
+//   - Static assets (js, css, images) → network-first, cache fallback
 self.addEventListener('fetch', event => {
   const url = new URL(event.request.url);
 
-  // Always go network for the predict API
+  // Never intercept API calls or HTML navigations
   if (url.pathname === '/predict') return;
+  if (event.request.mode === 'navigate') return;
 
+  // Static assets: network-first with cache fallback
   event.respondWith(
     fetch(event.request)
       .then(res => {
@@ -35,6 +35,6 @@ self.addEventListener('fetch', event => {
         }
         return res;
       })
-      .catch(() => caches.match(event.request).then(r => r || caches.match(OFFLINE_URL)))
+      .catch(() => caches.match(event.request))
   );
 });
