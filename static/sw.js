@@ -1,4 +1,4 @@
-const CACHE = 'churnsense-v1';
+const CACHE = 'churnsense-v2';
 const OFFLINE_URL = '/';
 
 // On install: cache the shell
