@@ -1,0 +1,32 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.pycache
+
+# Virtual environments
+churn_env/
+.venv/
+venv/
+env/
+
+# Jupyter
+.ipynb_checkpoints/
+*.ipynb
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Secrets
+.env
+*.env
+
+# Build artefacts
+dist/
+build/
+*.egg-info/
+
+# Vercel
+.vercel/

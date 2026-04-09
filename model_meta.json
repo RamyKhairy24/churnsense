@@ -1,0 +1,27 @@
+{
+  "model_name": "Gradient Boosting",
+  "features": [
+    "Gender",
+    "Country",
+    "SubscriptionType"
+  ],
+  "categories": {
+    "Gender": [
+      "Female",
+      "Male"
+    ],
+    "Country": [
+      "Canada",
+      "Egypt",
+      "Germany",
+      "India",
+      "UK",
+      "USA"
+    ],
+    "SubscriptionType": [
+      "Basic",
+      "Free",
+      "Premium"
+    ]
+  }
+}

@@ -1,0 +1,1713 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="theme-color" content="#08080f" />
+  <link rel="manifest" href="/static/manifest.json" />
+  <!-- iOS splash/icon -->
+  <link rel="apple-touch-icon" href="/static/icon-192.png" />
+  <meta name="apple-mobile-web-app-title" content="ChurnSense" />
+  <title>ChurnSense — Customer Churn Predictor</title>
+  <style>
+/* ═══════════════════════════════════════════════════════════════════
+   RESET & TOKENS
+═══════════════════════════════════════════════════════════════════ */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  /* brand */
+  --a1: #7c6fff;
+  --a2: #f72585;
+  --a3: #4cc9f0;
+  --success: #2ec27e;
+  --warn:    #f7b731;
+  --danger:  #f72585;
+  /* safe areas */
+  --sat: env(safe-area-inset-top,    0px);
+  --sab: env(safe-area-inset-bottom, 0px);
+  --sal: env(safe-area-inset-left,   0px);
+  --sar: env(safe-area-inset-right,  0px);
+  /* easing */
+  --spring: cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  --ease:   cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+[data-theme="dark"] {
+  --bg:        #08080f;
+  --bg2:       #0e0e1c;
+  --surface:   #13131f;
+  --surface2:  #1a1a2e;
+  --surface3:  #22223a;
+  --border:    rgba(255,255,255,0.07);
+  --border-hi: rgba(124,111,255,0.5);
+  --text:      #eeeef8;
+  --text2:     #9999bb;
+  --text3:     #55556a;
+  --glow:      rgba(124,111,255,0.15);
+}
+
+[data-theme="light"] {
+  --bg:        #f2f2fa;
+  --bg2:       #e8e8f5;
+  --surface:   #ffffff;
+  --surface2:  #f5f5ff;
+  --surface3:  #eaeaf8;
+  --border:    rgba(0,0,0,0.07);
+  --border-hi: rgba(124,111,255,0.45);
+  --text:      #111122;
+  --text2:     #555577;
+  --text3:     #aaaacc;
+  --glow:      rgba(124,111,255,0.1);
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   BASE
+═══════════════════════════════════════════════════════════════════ */
+html {
+  height: 100%;
+  padding:
+    var(--sat)
+    var(--sar)
+    var(--sab)
+    var(--sal);
+  scroll-behavior: smooth;
+}
+
+body {
+  min-height: 100dvh;
+  background: var(--bg);
+  color: var(--text);
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display",
+               "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  font-size: clamp(14px, 1.6vw, 15px);
+  line-height: 1.65;
+  transition: background 0.4s var(--ease), color 0.4s var(--ease);
+  overflow-x: hidden;
+}
+
+/* Gradient background mesh */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  background:
+    radial-gradient(ellipse 70% 50% at 15% 10%,  rgba(124,111,255,0.12) 0%, transparent 70%),
+    radial-gradient(ellipse 60% 40% at 85% 90%,  rgba(247,37,133,0.09)  0%, transparent 65%),
+    radial-gradient(ellipse 50% 35% at 50% 50%,  rgba(76,201,240,0.05)  0%, transparent 60%);
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   LAYOUT
+═══════════════════════════════════════════════════════════════════ */
+.page {
+  position: relative;
+  z-index: 1;
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+}
+
+main {
+  flex: 1;
+  padding: clamp(20px, 4vw, 56px) clamp(16px, 5vw, 40px);
+  max-width: 780px;
+  margin: 0 auto;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: clamp(24px, 4vw, 40px);
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   HEADER
+═══════════════════════════════════════════════════════════════════ */
+header {
+  position: sticky;
+  top: 0;
+  z-index: 200;
+  background: rgba(8,8,15,0.72);
+  backdrop-filter: blur(28px) saturate(180%);
+  -webkit-backdrop-filter: blur(28px) saturate(180%);
+  border-bottom: 1px solid var(--border);
+  padding:
+    clamp(12px, 2vw, 16px)
+    clamp(16px, 5vw, 40px);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  transition: background 0.4s;
+}
+
+[data-theme="light"] header {
+  background: rgba(242,242,250,0.8);
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  text-decoration: none;
+}
+
+.logo-mark {
+  width: clamp(34px,7vw,40px);
+  height: clamp(34px,7vw,40px);
+  border-radius: 11px;
+  background: linear-gradient(135deg, var(--a1), var(--a2));
+  display: grid;
+  place-items: center;
+  font-size: 1.15em;
+  box-shadow: 0 4px 16px rgba(124,111,255,0.35);
+  flex-shrink: 0;
+}
+
+.logo-text {
+  font-size: clamp(1rem, 3vw, 1.25rem);
+  font-weight: 800;
+  letter-spacing: -0.5px;
+  background: linear-gradient(130deg, var(--a1) 20%, var(--a2) 80%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.logo-badge {
+  font-size: 0.6rem;
+  font-weight: 700;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  padding: 3px 7px;
+  border-radius: 6px;
+  background: linear-gradient(135deg, var(--a1), var(--a2));
+  color: #fff;
+  -webkit-text-fill-color: #fff;
+  line-height: 1;
+  align-self: center;
+  display: none;
+}
+
+@media (min-width: 480px) { .logo-badge { display: inline; } }
+
+.header-right { display: flex; align-items: center; gap: 8px; }
+
+.icon-btn {
+  width: 38px; height: 38px;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  background: var(--surface2);
+  cursor: pointer;
+  font-size: 1.1rem;
+  display: grid; place-items: center;
+  transition: background 0.2s, transform 0.15s, border-color 0.2s;
+  color: var(--text2);
+}
+.icon-btn:hover { background: var(--surface3); border-color: var(--border-hi); transform: scale(1.05); }
+
+/* ═══════════════════════════════════════════════════════════════════
+   HERO
+═══════════════════════════════════════════════════════════════════ */
+.hero { text-align: center; }
+
+.hero-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 99px;
+  padding: 6px 14px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  color: var(--text2);
+  text-transform: uppercase;
+  margin-bottom: 18px;
+}
+
+.hero-eyebrow .dot {
+  width: 7px; height: 7px;
+  border-radius: 50%;
+  background: var(--success);
+  animation: pulse-dot 2s ease infinite;
+}
+
+@keyframes pulse-dot {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(46,194,126,0.6); }
+  50%       { box-shadow: 0 0 0 5px rgba(46,194,126,0); }
+}
+
+.hero h1 {
+  font-size: clamp(1.75rem, 6vw, 3.2rem);
+  font-weight: 900;
+  letter-spacing: -1.5px;
+  line-height: 1.1;
+  margin-bottom: 14px;
+}
+
+.grad-text {
+  background: linear-gradient(130deg, var(--a1) 0%, var(--a2) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.hero p {
+  color: var(--text2);
+  font-size: clamp(0.88rem, 2.2vw, 1rem);
+  max-width: 480px;
+  margin: 0 auto;
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   STEP INDICATORS
+═══════════════════════════════════════════════════════════════════ */
+.steps {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0;
+}
+
+.step {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  position: relative;
+}
+
+.step-num {
+  width: 32px; height: 32px;
+  border-radius: 50%;
+  border: 2px solid var(--border);
+  background: var(--surface2);
+  display: grid; place-items: center;
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--text3);
+  transition: all 0.3s var(--ease);
+  z-index: 1;
+}
+
+.step.active .step-num {
+  border-color: var(--a1);
+  background: var(--a1);
+  color: #fff;
+  box-shadow: 0 0 0 5px rgba(124,111,255,0.2);
+}
+
+.step.done .step-num {
+  border-color: var(--success);
+  background: var(--success);
+  color: #fff;
+}
+
+.step-label {
+  font-size: 0.68rem;
+  font-weight: 600;
+  color: var(--text3);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  white-space: nowrap;
+  transition: color 0.3s;
+}
+
+.step.active .step-label { color: var(--a1); }
+.step.done  .step-label  { color: var(--success); }
+
+.step-line {
+  flex: 1;
+  height: 2px;
+  background: var(--border);
+  min-width: clamp(24px, 5vw, 60px);
+  margin-bottom: 20px;
+  transition: background 0.4s;
+}
+
+.step-line.done { background: var(--success); }
+
+/* ═══════════════════════════════════════════════════════════════════
+   FORM CARD
+═══════════════════════════════════════════════════════════════════ */
+.form-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: clamp(18px, 4vw, 26px);
+  padding: clamp(20px, 5vw, 40px);
+  box-shadow: 0 1px 0 rgba(255,255,255,0.04) inset,
+              0 16px 56px rgba(0,0,0,0.35);
+}
+
+.section-label {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: clamp(14px, 3vw, 20px);
+}
+
+.section-icon {
+  width: 34px; height: 34px;
+  border-radius: 9px;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  display: grid; place-items: center;
+  font-size: 1em;
+  flex-shrink: 0;
+}
+
+.section-title {
+  font-size: clamp(0.9rem, 2.5vw, 1rem);
+  font-weight: 700;
+  color: var(--text);
+}
+
+.section-sub {
+  font-size: 0.74rem;
+  color: var(--text2);
+  margin-top: 1px;
+}
+
+.field-group { margin-bottom: clamp(22px, 4vw, 32px); }
+.field-group:last-of-type { margin-bottom: 0; }
+
+/* ── Option grids ─────────────────────────────────── */
+.opt-grid {
+  display: grid;
+  gap: clamp(8px, 2vw, 12px);
+}
+
+.opt-grid.two   { grid-template-columns: 1fr 1fr; }
+.opt-grid.three { grid-template-columns: repeat(3, 1fr); }
+.opt-grid.six   { grid-template-columns: repeat(2, 1fr); }
+
+@media (min-width: 480px) {
+  .opt-grid.six { grid-template-columns: repeat(3, 1fr); }
+}
+
+@media (min-width: 640px) {
+  .opt-grid.six { grid-template-columns: repeat(6, 1fr); }
+}
+
+/* ── Option card ──────────────────────────────────── */
+.opt {
+  position: relative;
+  cursor: pointer;
+  user-select: none;
+}
+
+.opt input[type="radio"] {
+  position: absolute; opacity: 0; width: 0; height: 0;
+}
+
+.opt-face {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: clamp(12px, 2.5vw, 16px) clamp(8px, 2vw, 12px);
+  border-radius: 14px;
+  border: 1.5px solid var(--border);
+  background: var(--surface2);
+  transition: all 0.22s var(--ease);
+  text-align: center;
+  height: 100%;
+  min-height: 72px;
+}
+
+.opt-face .emoji {
+  font-size: clamp(1.4rem, 4vw, 1.8rem);
+  line-height: 1;
+  transition: transform 0.2s var(--spring);
+}
+
+.opt-face .label {
+  font-size: clamp(0.72rem, 1.8vw, 0.82rem);
+  font-weight: 600;
+  color: var(--text2);
+  transition: color 0.2s;
+  line-height: 1.2;
+}
+
+.opt-face .desc {
+  font-size: 0.68rem;
+  color: var(--text3);
+  transition: color 0.2s;
+}
+
+/* Hover */
+.opt:hover .opt-face {
+  border-color: rgba(124,111,255,0.4);
+  background: var(--surface3);
+  transform: translateY(-2px);
+}
+
+.opt:hover .opt-face .emoji { transform: scale(1.15); }
+
+/* Checked */
+.opt input:checked + .opt-face {
+  border-color: var(--a1);
+  background: rgba(124,111,255,0.1);
+  box-shadow: 0 0 0 3px rgba(124,111,255,0.15),
+              inset 0 1px 0 rgba(255,255,255,0.08);
+}
+
+.opt input:checked + .opt-face .label { color: var(--a1); }
+.opt input:checked + .opt-face .emoji { transform: scale(1.2); }
+.opt input:checked + .opt-face .desc  { color: var(--text2); }
+
+/* Check mark */
+.opt-face::after {
+  content: '✓';
+  position: absolute;
+  top: 7px;
+  right: 9px;
+  width: 18px; height: 18px;
+  border-radius: 50%;
+  background: var(--a1);
+  color: #fff;
+  font-size: 0.65rem;
+  font-weight: 900;
+  display: grid;
+  place-items: center;
+  opacity: 0;
+  transform: scale(0.5);
+  transition: all 0.2s var(--spring);
+}
+
+.opt input:checked + .opt-face::after {
+  opacity: 1;
+  transform: scale(1);
+}
+
+/* ── Subscription tiers special styling ──────────── */
+.opt.tier-basic  input:checked + .opt-face { border-color: #8888cc; background: rgba(136,136,204,0.1); }
+.opt.tier-basic  input:checked + .opt-face .label { color: #8888cc; }
+.opt.tier-basic  input:checked + .opt-face::after { background: #8888cc; }
+
+.opt.tier-free   input:checked + .opt-face { border-color: var(--a3); background: rgba(76,201,240,0.09); }
+.opt.tier-free   input:checked + .opt-face .label { color: var(--a3); }
+.opt.tier-free   input:checked + .opt-face::after { background: var(--a3); }
+
+.opt.tier-prem   input:checked + .opt-face { border-color: var(--warn); background: rgba(247,183,49,0.09); }
+.opt.tier-prem   input:checked + .opt-face .label { color: var(--warn); }
+.opt.tier-prem   input:checked + .opt-face::after { background: var(--warn); }
+
+/* ── Divider ──────────────────────────────────────── */
+.divider {
+  height: 1px;
+  background: var(--border);
+  margin: clamp(20px, 4vw, 30px) 0;
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   SUBMIT BUTTON
+═══════════════════════════════════════════════════════════════════ */
+.predict-btn {
+  width: 100%;
+  padding: clamp(15px, 3vw, 18px);
+  border: none;
+  border-radius: 14px;
+  background: linear-gradient(135deg, var(--a1) 0%, var(--a2) 100%);
+  color: #fff;
+  font-size: clamp(0.95rem, 2.5vw, 1.05rem);
+  font-weight: 700;
+  font-family: inherit;
+  cursor: pointer;
+  letter-spacing: 0.2px;
+  transition: opacity 0.2s, transform 0.15s, box-shadow 0.2s;
+  box-shadow: 0 6px 28px rgba(124,111,255,0.35);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  position: relative;
+  overflow: hidden;
+}
+
+.predict-btn::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, rgba(255,255,255,0.15) 0%, transparent 60%);
+}
+
+.predict-btn:not(:disabled):hover {
+  opacity: 0.92;
+  transform: translateY(-2px);
+  box-shadow: 0 10px 36px rgba(124,111,255,0.45);
+}
+
+.predict-btn:not(:disabled):active { transform: translateY(0); }
+
+.predict-btn:disabled {
+  opacity: 0.38;
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
+.predict-btn .btn-icon { font-size: 1.1em; transition: transform 0.3s; }
+.predict-btn:not(:disabled):hover .btn-icon { transform: scale(1.2) rotate(-10deg); }
+
+.predict-btn .spinner-ring {
+  display: none;
+  width: 18px; height: 18px;
+  border: 2.5px solid rgba(255,255,255,0.3);
+  border-top-color: #fff;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin { to { transform: rotate(360deg); } }
+
+.predict-btn.loading .btn-text,
+.predict-btn.loading .btn-icon { display: none; }
+.predict-btn.loading .spinner-ring { display: block; }
+
+/* ═══════════════════════════════════════════════════════════════════
+   RESULT SECTION
+═══════════════════════════════════════════════════════════════════ */
+#result {
+  display: none;
+  animation: slideUp 0.5s var(--spring);
+}
+
+#result.show { display: block; }
+
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(28px) scale(0.96); }
+  to   { opacity: 1; transform: translateY(0)    scale(1); }
+}
+
+.result-card {
+  border-radius: clamp(18px, 4vw, 26px);
+  border: 1.5px solid var(--border);
+  overflow: hidden;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.35);
+}
+
+/* Top header strip */
+.result-header {
+  padding: clamp(20px, 4vw, 32px);
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  border-bottom: 1px solid var(--border);
+}
+
+.result-header.churn  {
+  background: linear-gradient(135deg, rgba(247,37,133,0.15) 0%, rgba(247,37,133,0.04) 100%);
+}
+.result-header.safe {
+  background: linear-gradient(135deg, rgba(46,194,126,0.14) 0%, rgba(46,194,126,0.03) 100%);
+}
+
+.result-icon-wrap {
+  width: clamp(52px, 10vw, 64px);
+  height: clamp(52px, 10vw, 64px);
+  border-radius: 50%;
+  display: grid; place-items: center;
+  font-size: clamp(1.6rem, 5vw, 2rem);
+  flex-shrink: 0;
+}
+
+.result-icon-wrap.churn { background: rgba(247,37,133,0.18); border: 2px solid rgba(247,37,133,0.4); }
+.result-icon-wrap.safe  { background: rgba(46,194,126,0.18);  border: 2px solid rgba(46,194,126,0.4); }
+
+.result-title-group {}
+
+.result-verdict {
+  font-size: clamp(1.2rem, 4vw, 1.6rem);
+  font-weight: 900;
+  letter-spacing: -0.5px;
+  line-height: 1.1;
+}
+
+.result-verdict.churn { color: var(--a2); }
+.result-verdict.safe  { color: var(--success); }
+
+.result-sub {
+  font-size: clamp(0.8rem, 2vw, 0.9rem);
+  color: var(--text2);
+  margin-top: 4px;
+}
+
+/* Body */
+.result-body {
+  background: var(--surface);
+  padding: clamp(20px, 4vw, 32px);
+  display: grid;
+  gap: clamp(20px, 3vw, 28px);
+}
+
+/* Probability ring */
+.prob-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+}
+
+.ring-wrap {
+  position: relative;
+  width: clamp(120px, 28vw, 150px);
+  height: clamp(120px, 28vw, 150px);
+}
+
+.ring-svg {
+  width: 100%; height: 100%;
+  transform: rotate(-90deg);
+}
+
+.ring-track {
+  fill: none;
+  stroke: var(--surface3);
+  stroke-width: 10;
+}
+
+.ring-fill-churn {
+  fill: none;
+  stroke: url(#grad-churn);
+  stroke-width: 10;
+  stroke-linecap: round;
+  stroke-dasharray: 339.29;
+  stroke-dashoffset: 339.29;
+  transition: stroke-dashoffset 1.2s var(--ease);
+}
+
+.ring-fill-safe {
+  fill: none;
+  stroke: url(#grad-safe);
+  stroke-width: 10;
+  stroke-linecap: round;
+  stroke-dasharray: 339.29;
+  stroke-dashoffset: 339.29;
+  transition: stroke-dashoffset 1.2s var(--ease);
+}
+
+.ring-center {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.ring-pct {
+  font-size: clamp(1.5rem, 5vw, 2rem);
+  font-weight: 900;
+  letter-spacing: -1px;
+  line-height: 1;
+}
+
+.ring-pct.churn { color: var(--a2); }
+.ring-pct.safe  { color: var(--success); }
+
+.ring-label {
+  font-size: 0.65rem;
+  color: var(--text3);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-top: 3px;
+}
+
+.prob-caption {
+  text-align: center;
+  font-size: clamp(0.82rem, 2vw, 0.9rem);
+  color: var(--text2);
+  max-width: 320px;
+}
+
+/* Insight pills */
+.insight-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 10px;
+}
+
+.insight-pill {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 12px 14px;
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+}
+
+.insight-pill .pi-icon { font-size: 1.2rem; flex-shrink: 0; line-height: 1.3; }
+
+.insight-pill .pi-text {}
+.insight-pill .pi-label {
+  font-size: 0.7rem;
+  color: var(--text3);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  font-weight: 600;
+}
+.insight-pill .pi-val {
+  font-size: 0.88rem;
+  font-weight: 700;
+  color: var(--text);
+  margin-top: 2px;
+}
+
+/* Recommendations box */
+.reco-box {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: clamp(14px, 3vw, 20px);
+}
+
+.reco-box h4 {
+  font-size: 0.8rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.7px;
+  color: var(--text2);
+  margin-bottom: 12px;
+  display: flex; align-items: center; gap: 7px;
+}
+
+.reco-list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+}
+
+.reco-list li {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+  font-size: clamp(0.82rem, 2vw, 0.88rem);
+  color: var(--text2);
+  line-height: 1.5;
+}
+
+.reco-list li .ri { flex-shrink: 0; line-height: 1.5; }
+
+/* Selection summary */
+.summary-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 99px;
+  padding: 5px 12px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--text2);
+}
+
+.chip .chip-e { font-size: 0.95em; }
+
+/* Action buttons */
+.result-actions {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 10px;
+  padding: clamp(14px, 3vw, 20px);
+  border-top: 1px solid var(--border);
+  background: var(--surface);
+}
+
+.btn-secondary {
+  padding: 12px 20px;
+  border-radius: 12px;
+  border: 1.5px solid var(--border);
+  background: var(--surface2);
+  color: var(--text2);
+  font-size: 0.88rem;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+  display: flex; align-items: center; gap: 7px;
+  transition: all 0.2s;
+  white-space: nowrap;
+}
+
+.btn-secondary:hover { border-color: var(--border-hi); color: var(--a1); }
+
+.btn-new {
+  padding: 12px 20px;
+  border-radius: 12px;
+  border: none;
+  background: var(--surface2);
+  color: var(--text2);
+  font-size: 0.88rem;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+  display: flex; align-items: center; gap: 7px;
+  transition: all 0.2s;
+  border: 1.5px solid var(--border);
+}
+
+.btn-new:hover { border-color: var(--a1); color: var(--a1); background: rgba(124,111,255,0.06); }
+
+/* ═══════════════════════════════════════════════════════════════════
+   STATS BAR
+═══════════════════════════════════════════════════════════════════ */
+.stats-bar {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: clamp(8px, 2vw, 14px);
+}
+
+.stat-tile {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: clamp(12px, 3vw, 20px) clamp(10px, 2vw, 16px);
+  text-align: center;
+  transition: border-color 0.2s, transform 0.2s;
+}
+
+.stat-tile:hover { border-color: var(--border-hi); transform: translateY(-2px); }
+
+.stat-num {
+  font-size: clamp(1.2rem, 4vw, 1.8rem);
+  font-weight: 900;
+  letter-spacing: -1px;
+  background: linear-gradient(135deg, var(--a1), var(--a2));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  line-height: 1;
+  margin-bottom: 5px;
+}
+
+.stat-lbl {
+  font-size: clamp(0.62rem, 1.5vw, 0.72rem);
+  color: var(--text3);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  font-weight: 600;
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   FOOTER
+═══════════════════════════════════════════════════════════════════ */
+footer {
+  border-top: 1px solid var(--border);
+  padding: clamp(14px, 2.5vw, 20px) clamp(16px, 5vw, 40px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  font-size: 0.75rem;
+  color: var(--text3);
+  text-align: center;
+}
+
+footer a { color: var(--a1); text-decoration: none; }
+footer a:hover { text-decoration: underline; }
+
+.footer-dot { color: var(--text3); }
+
+/* ═══════════════════════════════════════════════════════════════════
+   VALIDATION STATE
+═══════════════════════════════════════════════════════════════════ */
+.field-group .req-note {
+  font-size: 0.73rem;
+  color: var(--text3);
+  margin-top: 8px;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  transition: color 0.3s;
+}
+
+.field-group .req-note.satisfied { color: var(--success); }
+
+/* ═══════════════════════════════════════════════════════════════════
+   SCROLLBAR
+═══════════════════════════════════════════════════════════════════ */
+::-webkit-scrollbar              { width: 5px; }
+::-webkit-scrollbar-track        { background: transparent; }
+::-webkit-scrollbar-thumb        { background: var(--surface3); border-radius: 99px; }
+::-webkit-scrollbar-thumb:hover  { background: var(--a1); }
+
+/* ═══════════════════════════════════════════════════════════════════
+   DESKTOP LAYOUT ADJUSTMENTS
+═══════════════════════════════════════════════════════════════════ */
+@media (min-width: 760px) {
+  .result-body {
+    grid-template-columns: auto 1fr;
+    grid-template-areas:
+      "ring  insights"
+      "ring  reco"
+      "chips chips";
+  }
+
+  .prob-section    { grid-area: ring; }
+  .insight-row     { grid-area: insights; align-content: start; }
+  .reco-box        { grid-area: reco; }
+  .summary-section { grid-area: chips; }
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   TOAST
+═══════════════════════════════════════════════════════════════════ */
+.toast {
+  position: fixed;
+  bottom: calc(20px + var(--sab));
+  left: 50%;
+  transform: translateX(-50%) translateY(80px);
+  background: var(--surface3);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 10px 18px;
+  font-size: 0.85rem;
+  color: var(--text2);
+  box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+  z-index: 9999;
+  transition: transform 0.4s var(--spring), opacity 0.4s;
+  opacity: 0;
+  pointer-events: none;
+  white-space: nowrap;
+}
+
+.toast.show {
+  transform: translateX(-50%) translateY(0);
+  opacity: 1;
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   ADD TO HOME SCREEN BAR
+═══════════════════════════════════════════════════════════════════ */
+.a2hs-bar {
+  position: fixed;
+  bottom: calc(16px + var(--sab));
+  left: 50%;
+  transform: translateX(-50%) translateY(100px);
+  opacity: 0;
+  background: var(--surface3);
+  border: 1px solid var(--border-hi);
+  border-radius: 16px;
+  padding: 12px 14px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  max-width: calc(100vw - 32px);
+  width: 420px;
+  box-shadow: 0 8px 40px rgba(0,0,0,0.5);
+  z-index: 9998;
+  transition: transform 0.4s var(--spring), opacity 0.4s;
+  pointer-events: none;
+}
+
+.a2hs-bar.show {
+  transform: translateX(-50%) translateY(0);
+  opacity: 1;
+  pointer-events: all;
+}
+
+.a2hs-icon { font-size: 1.5rem; flex-shrink: 0; }
+
+.a2hs-text {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  font-size: 0.82rem;
+  line-height: 1.3;
+}
+
+.a2hs-text strong { color: var(--text); }
+.a2hs-text span   { color: var(--text2); }
+
+.a2hs-btn {
+  padding: 8px 14px;
+  border-radius: 9px;
+  border: none;
+  background: var(--a1);
+  color: #fff;
+  font-size: 0.82rem;
+  font-weight: 700;
+  font-family: inherit;
+  cursor: pointer;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.a2hs-dismiss {
+  background: none;
+  border: none;
+  color: var(--text3);
+  cursor: pointer;
+  font-size: 0.85rem;
+  padding: 4px;
+  flex-shrink: 0;
+  line-height: 1;
+}
+
+.a2hs-dismiss:hover { color: var(--text2); }
+  </style>
+</head>
+<body>
+<div class="page">
+
+<!-- ══════════════════════════════════════════
+     HEADER
+══════════════════════════════════════════ -->
+<header>
+  <div class="logo">
+    <div class="logo-mark">📡</div>
+    <span class="logo-text">ChurnSense</span>
+    <span class="logo-badge">AI</span>
+  </div>
+  <div class="header-right">
+    <button class="icon-btn" id="themeBtn" aria-label="Toggle theme" title="Toggle theme">🌙</button>
+  </div>
+</header>
+
+<!-- ══════════════════════════════════════════
+     MAIN
+══════════════════════════════════════════ -->
+<main>
+
+  <!-- Hero -->
+  <div class="hero">
+    <div class="hero-eyebrow"><span class="dot"></span> Model Live · Gradient Boosting</div>
+    <h1>Will your customer<br><span class="grad-text">stay or leave?</span></h1>
+    <p>Enter a customer profile below and get an instant AI-powered churn prediction with actionable insights.</p>
+  </div>
+
+  <!-- Steps -->
+  <div class="steps" id="stepBar" aria-label="Progress steps">
+    <div class="step active" id="step1">
+      <div class="step-num">1</div>
+      <div class="step-label">Gender</div>
+    </div>
+    <div class="step-line" id="line1"></div>
+    <div class="step active" id="step2">
+      <div class="step-num">2</div>
+      <div class="step-label">Country</div>
+    </div>
+    <div class="step-line" id="line2"></div>
+    <div class="step active" id="step3">
+      <div class="step-num">3</div>
+      <div class="step-label">Plan</div>
+    </div>
+    <div class="step-line" id="line3"></div>
+    <div class="step" id="step4">
+      <div class="step-num">4</div>
+      <div class="step-label">Result</div>
+    </div>
+  </div>
+
+  <!-- ── FORM CARD ─────────────────────────────── -->
+  <form class="form-card" id="churnForm" novalidate>
+
+    <!-- SVG gradient defs for the ring -->
+    <svg width="0" height="0" style="position:absolute">
+      <defs>
+        <linearGradient id="grad-churn" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stop-color="#f72585"/>
+          <stop offset="100%" stop-color="#b5179e"/>
+        </linearGradient>
+        <linearGradient id="grad-safe" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stop-color="#2ec27e"/>
+          <stop offset="100%" stop-color="#0d9488"/>
+        </linearGradient>
+      </defs>
+    </svg>
+
+    <!-- ── Step 1: Gender ──────────────────────── -->
+    <div class="field-group" id="fg-gender">
+      <div class="section-label">
+        <div class="section-icon">👤</div>
+        <div>
+          <div class="section-title">Customer Gender</div>
+          <div class="section-sub">Select the customer's gender</div>
+        </div>
+      </div>
+
+      <div class="opt-grid two">
+        <label class="opt">
+          <input type="radio" name="Gender" value="Female" />
+          <div class="opt-face">
+            <span class="emoji">👩</span>
+            <span class="label">Female</span>
+          </div>
+        </label>
+        <label class="opt">
+          <input type="radio" name="Gender" value="Male" />
+          <div class="opt-face">
+            <span class="emoji">👨</span>
+            <span class="label">Male</span>
+          </div>
+        </label>
+      </div>
+
+      <div class="req-note" id="note-gender">⬆ Pick a gender to continue</div>
+    </div>
+
+    <div class="divider"></div>
+
+    <!-- ── Step 2: Country ─────────────────────── -->
+    <div class="field-group" id="fg-country">
+      <div class="section-label">
+        <div class="section-icon">🌍</div>
+        <div>
+          <div class="section-title">Country</div>
+          <div class="section-sub">Where is the customer located?</div>
+        </div>
+      </div>
+
+      <div class="opt-grid six">
+        <label class="opt">
+          <input type="radio" name="Country" value="Canada" />
+          <div class="opt-face">
+            <span class="emoji">🇨🇦</span>
+            <span class="label">Canada</span>
+          </div>
+        </label>
+        <label class="opt">
+          <input type="radio" name="Country" value="Egypt" />
+          <div class="opt-face">
+            <span class="emoji">🇪🇬</span>
+            <span class="label">Egypt</span>
+          </div>
+        </label>
+        <label class="opt">
+          <input type="radio" name="Country" value="Germany" />
+          <div class="opt-face">
+            <span class="emoji">🇩🇪</span>
+            <span class="label">Germany</span>
+          </div>
+        </label>
+        <label class="opt">
+          <input type="radio" name="Country" value="India" />
+          <div class="opt-face">
+            <span class="emoji">🇮🇳</span>
+            <span class="label">India</span>
+          </div>
+        </label>
+        <label class="opt">
+          <input type="radio" name="Country" value="UK" />
+          <div class="opt-face">
+            <span class="emoji">🇬🇧</span>
+            <span class="label">UK</span>
+          </div>
+        </label>
+        <label class="opt">
+          <input type="radio" name="Country" value="USA" />
+          <div class="opt-face">
+            <span class="emoji">🇺🇸</span>
+            <span class="label">USA</span>
+          </div>
+        </label>
+      </div>
+
+      <div class="req-note" id="note-country">⬆ Pick a country to continue</div>
+    </div>
+
+    <div class="divider"></div>
+
+    <!-- ── Step 3: Subscription ────────────────── -->
+    <div class="field-group" id="fg-sub">
+      <div class="section-label">
+        <div class="section-icon">💳</div>
+        <div>
+          <div class="section-title">Subscription Plan</div>
+          <div class="section-sub">What plan is the customer on?</div>
+        </div>
+      </div>
+
+      <div class="opt-grid three">
+        <label class="opt tier-basic">
+          <input type="radio" name="SubscriptionType" value="Basic" />
+          <div class="opt-face">
+            <span class="emoji">📦</span>
+            <span class="label">Basic</span>
+            <span class="desc">Entry-level</span>
+          </div>
+        </label>
+        <label class="opt tier-free">
+          <input type="radio" name="SubscriptionType" value="Free" />
+          <div class="opt-face">
+            <span class="emoji">🎁</span>
+            <span class="label">Free</span>
+            <span class="desc">No payment</span>
+          </div>
+        </label>
+        <label class="opt tier-prem">
+          <input type="radio" name="SubscriptionType" value="Premium" />
+          <div class="opt-face">
+            <span class="emoji">👑</span>
+            <span class="label">Premium</span>
+            <span class="desc">Full access</span>
+          </div>
+        </label>
+      </div>
+
+      <div class="req-note" id="note-sub">⬆ Pick a plan to continue</div>
+    </div>
+
+    <div class="divider"></div>
+
+    <!-- ── Predict button ──────────────────────── -->
+    <button type="submit" class="predict-btn" id="predictBtn" disabled>
+      <span class="btn-icon">🔮</span>
+      <span class="btn-text">Predict Churn Risk</span>
+      <span class="spinner-ring"></span>
+    </button>
+
+  </form>
+  <!-- /form-card -->
+
+  <!-- ── RESULT ──────────────────────────────────── -->
+  <div id="result" role="region" aria-live="polite" aria-label="Prediction result">
+
+    <div class="result-card">
+
+      <!-- Header -->
+      <div class="result-header" id="resultHeader">
+        <div class="result-icon-wrap" id="resultIconWrap">
+          <span id="resultIcon"></span>
+        </div>
+        <div class="result-title-group">
+          <div class="result-verdict" id="resultVerdict"></div>
+          <div class="result-sub" id="resultSub"></div>
+        </div>
+      </div>
+
+      <!-- Body -->
+      <div class="result-body">
+
+        <!-- Ring -->
+        <div class="prob-section">
+          <div class="ring-wrap">
+            <svg class="ring-svg" viewBox="0 0 120 120">
+              <circle class="ring-track" cx="60" cy="60" r="54"/>
+              <circle class="ring-fill-churn" id="ringChurn" cx="60" cy="60" r="54" style="display:none"/>
+              <circle class="ring-fill-safe"  id="ringSafe"  cx="60" cy="60" r="54" style="display:none"/>
+            </svg>
+            <div class="ring-center">
+              <div class="ring-pct" id="ringPct"></div>
+              <div class="ring-label">churn risk</div>
+            </div>
+          </div>
+          <div class="prob-caption" id="probCaption"></div>
+        </div>
+
+        <!-- Insight pills -->
+        <div class="insight-row" id="insightRow"></div>
+
+        <!-- Recommendations -->
+        <div class="reco-box">
+          <h4>💡 Recommended Actions</h4>
+          <ul class="reco-list" id="recoList"></ul>
+        </div>
+
+        <!-- Summary chips -->
+        <div class="summary-section">
+          <div class="req-note satisfied" style="margin-bottom:10px">✓ Prediction based on this profile:</div>
+          <div class="summary-chips" id="summaryChips"></div>
+        </div>
+
+      </div>
+      <!-- /result-body -->
+
+      <!-- Actions -->
+      <div class="result-actions">
+        <button class="btn-new" id="predictNewBtn">
+          ← Predict another customer
+        </button>
+      </div>
+
+    </div>
+  </div>
+  <!-- /result -->
+
+  <!-- Stats bar -->
+  <div class="stats-bar">
+    <div class="stat-tile">
+      <div class="stat-num">1,000</div>
+      <div class="stat-lbl">Training Samples</div>
+    </div>
+    <div class="stat-tile">
+      <div class="stat-num">3</div>
+      <div class="stat-lbl">Features Used</div>
+    </div>
+    <div class="stat-tile">
+      <div class="stat-num">GB</div>
+      <div class="stat-lbl">Gradient Boosting</div>
+    </div>
+  </div>
+
+</main>
+
+<footer>
+  <span>© 2026 ChurnSense</span>
+  <span class="footer-dot">·</span>
+  <span>Powered by Gradient Boosting + Flask</span>
+  <span class="footer-dot">·</span>
+  <span>scikit-learn</span>
+</footer>
+
+</div><!-- /page -->
+
+<!-- Toast -->
+<div class="toast" id="toast"></div>
+
+<!-- Add to Home Screen banner (Android / Chrome) -->
+<div class="a2hs-bar" id="a2hsBar">
+  <span class="a2hs-icon">📡</span>
+  <div class="a2hs-text">
+    <strong>Install ChurnSense</strong>
+    <span>Add to your home screen for quick access</span>
+  </div>
+  <button class="a2hs-btn" id="a2hsBtn">Install</button>
+  <button class="a2hs-dismiss" id="a2hsDismiss" aria-label="Dismiss">✕</button>
+</div>
+
+<script>
+/* ════════════════════════════════════════════════════════════
+   THEME
+════════════════════════════════════════════════════════════ */
+const html     = document.documentElement;
+const themeBtn = document.getElementById('themeBtn');
+
+let theme = localStorage.getItem('cs-theme') || 'dark';
+applyTheme(theme);
+
+themeBtn.addEventListener('click', () => {
+  theme = theme === 'dark' ? 'light' : 'dark';
+  applyTheme(theme);
+  localStorage.setItem('cs-theme', theme);
+});
+
+function applyTheme(t) {
+  html.dataset.theme    = t;
+  themeBtn.textContent  = t === 'dark' ? '🌙' : '☀️';
+}
+
+/* ════════════════════════════════════════════════════════════
+   COUNTRY / SUBSCRIPTION ICONS (for chips)
+════════════════════════════════════════════════════════════ */
+const ICONS = {
+  Female: '👩', Male: '👨',
+  Canada: '🇨🇦', Egypt: '🇪🇬', Germany: '🇩🇪',
+  India: '🇮🇳', UK: '🇬🇧', USA: '🇺🇸',
+  Basic: '📦', Free: '🎁', Premium: '👑'
+};
+
+/* ════════════════════════════════════════════════════════════
+   STEP + VALIDATION TRACKING
+════════════════════════════════════════════════════════════ */
+const form = document.getElementById('churnForm');
+const predictBtn = document.getElementById('predictBtn');
+
+const selections = { Gender: null, Country: null, SubscriptionType: null };
+
+const notes = {
+  Gender:           document.getElementById('note-gender'),
+  Country:          document.getElementById('note-country'),
+  SubscriptionType: document.getElementById('note-sub'),
+};
+
+form.querySelectorAll('input[type="radio"]').forEach(radio => {
+  radio.addEventListener('change', () => {
+    selections[radio.name] = radio.value;
+    // Update note
+    const note = notes[radio.name];
+    note.textContent = '✓ Selected: ' + radio.value;
+    note.classList.add('satisfied');
+    // Check if all done
+    checkReady();
+  });
+});
+
+function checkReady() {
+  const allDone = Object.values(selections).every(v => v !== null);
+  predictBtn.disabled = !allDone;
+
+  // Update step 4
+  const step4 = document.getElementById('step4');
+  if (allDone) {
+    step4.classList.add('active');
+    document.getElementById('line3').classList.add('done');
+  }
+}
+
+/* ════════════════════════════════════════════════════════════
+   PREDICTION
+════════════════════════════════════════════════════════════ */
+form.addEventListener('submit', async (e) => {
+  e.preventDefault();
+  if (predictBtn.disabled) return;
+
+  predictBtn.classList.add('loading');
+  predictBtn.disabled = true;
+
+  try {
+    const res  = await fetch('/predict', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        Gender:           selections.Gender,
+        Country:          selections.Country,
+        SubscriptionType: selections.SubscriptionType,
+      })
+    });
+
+    const data = await res.json();
+    if (data.error) throw new Error(data.error);
+    renderResult(data);
+
+  } catch (err) {
+    showToast('⚠️ ' + err.message);
+  } finally {
+    predictBtn.classList.remove('loading');
+    predictBtn.disabled = false;
+  }
+});
+
+/* ════════════════════════════════════════════════════════════
+   RENDER RESULT
+════════════════════════════════════════════════════════════ */
+function renderResult({ churn, probability }) {
+  const isChurn = churn === 1;
+  const pct     = probability;
+
+  /* header */
+  const header = document.getElementById('resultHeader');
+  const iconWrap  = document.getElementById('resultIconWrap');
+  const icon      = document.getElementById('resultIcon');
+  const verdict   = document.getElementById('resultVerdict');
+  const sub       = document.getElementById('resultSub');
+
+  header.className    = 'result-header ' + (isChurn ? 'churn' : 'safe');
+  iconWrap.className  = 'result-icon-wrap ' + (isChurn ? 'churn' : 'safe');
+  icon.textContent    = isChurn ? '⚠️' : '✅';
+
+  verdict.className   = 'result-verdict ' + (isChurn ? 'churn' : 'safe');
+  verdict.textContent = isChurn ? 'High Churn Risk' : 'Low Churn Risk';
+
+  sub.textContent = isChurn
+    ? 'This customer is predicted to churn — action is recommended.'
+    : 'This customer is predicted to stay — keep up the great experience!';
+
+  /* ring */
+  const circumference = 2 * Math.PI * 54; // ≈ 339.29
+
+  const ringChurn = document.getElementById('ringChurn');
+  const ringSafe  = document.getElementById('ringSafe');
+
+  ringChurn.style.display = 'none';
+  ringSafe.style.display  = 'none';
+
+  const activeRing = isChurn ? ringChurn : ringSafe;
+  activeRing.style.display = '';
+
+  // Reset then animate
+  activeRing.style.strokeDashoffset = circumference;
+  requestAnimationFrame(() => requestAnimationFrame(() => {
+    activeRing.style.strokeDashoffset = circumference * (1 - pct / 100);
+  }));
+
+  const ringPct = document.getElementById('ringPct');
+  ringPct.className   = 'ring-pct ' + (isChurn ? 'churn' : 'safe');
+  ringPct.textContent = pct + '%';
+
+  /* prob caption */
+  const caption = document.getElementById('probCaption');
+  if (pct >= 65)      caption.textContent = 'Very high probability — immediate attention needed.';
+  else if (pct >= 50) caption.textContent = 'Above average churn probability — monitor closely.';
+  else if (pct >= 40) caption.textContent = 'Near the threshold — worth keeping an eye on.';
+  else                caption.textContent = 'Low churn probability — customer appears loyal.';
+
+  /* insight row */
+  const insightRow = document.getElementById('insightRow');
+  insightRow.innerHTML = [
+    { icon: ICONS[selections.Gender],           label: 'Gender',       val: selections.Gender },
+    { icon: ICONS[selections.Country],          label: 'Country',      val: selections.Country },
+    { icon: ICONS[selections.SubscriptionType], label: 'Plan',         val: selections.SubscriptionType },
+    { icon: isChurn ? '🔴' : '🟢',              label: 'Prediction',   val: isChurn ? 'Churn' : 'Retained' },
+  ].map(p => `
+    <div class="insight-pill">
+      <span class="pi-icon">${p.icon}</span>
+      <div class="pi-text">
+        <div class="pi-label">${p.label}</div>
+        <div class="pi-val">${p.val}</div>
+      </div>
+    </div>
+  `).join('');
+
+  /* recommendations */
+  const recoList = document.getElementById('recoList');
+  const recos = isChurn
+    ? getChurnRecos(selections)
+    : getSafeRecos(selections);
+
+  recoList.innerHTML = recos.map(r =>
+    `<li><span class="ri">${r.icon}</span> ${r.text}</li>`
+  ).join('');
+
+  /* summary chips */
+  const chips = document.getElementById('summaryChips');
+  chips.innerHTML = ['Gender','Country','SubscriptionType'].map(f => `
+    <div class="chip">
+      <span class="chip-e">${ICONS[selections[f]]}</span>
+      <span>${selections[f]}</span>
+    </div>
+  `).join('');
+
+  /* show */
+  const resultEl = document.getElementById('result');
+  resultEl.classList.add('show');
+
+  /* mark step 4 done */
+  document.getElementById('step4').classList.add('done');
+
+  /* scroll to result */
+  setTimeout(() => {
+    resultEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }, 120);
+}
+
+/* ════════════════════════════════════════════════════════════
+   RECOMMENDATIONS
+════════════════════════════════════════════════════════════ */
+function getChurnRecos({ SubscriptionType, Country }) {
+  const recos = [
+    { icon: '📧', text: 'Send a personalised re-engagement email within 48 hours.' },
+    { icon: '🎯', text: 'Offer a targeted discount or loyalty reward to increase retention.' },
+  ];
+
+  if (SubscriptionType === 'Free') {
+    recos.push({ icon: '⬆️', text: 'Highlight Premium features — free users churn when they see limited value.' });
+  } else if (SubscriptionType === 'Basic') {
+    recos.push({ icon: '🔓', text: 'Offer a trial upgrade to showcase the full experience.' });
+  } else {
+    recos.push({ icon: '💎', text: 'Even Premium users churn — check support tickets and satisfaction scores.' });
+  }
+
+  recos.push({ icon: '📊', text: 'Add this customer to a churn-risk segment for dedicated follow-up.' });
+  return recos;
+}
+
+function getSafeRecos({ SubscriptionType }) {
+  const recos = [
+    { icon: '✨', text: 'Keep delivering consistent value — this customer is engaged.' },
+    { icon: '⭐', text: 'Ask for a review or referral while satisfaction is high.' },
+  ];
+
+  if (SubscriptionType === 'Free') {
+    recos.push({ icon: '🚀', text: 'Nudge toward a paid plan — free users can still be converted.' });
+  } else if (SubscriptionType === 'Basic') {
+    recos.push({ icon: '📈', text: 'Introduce Premium features gradually to increase upgrade likelihood.' });
+  } else {
+    recos.push({ icon: '🏆', text: 'Reward loyalty — consider a VIP perk or early-access feature.' });
+  }
+
+  recos.push({ icon: '🔁', text: 'Set a follow-up reminder in 30 days to reassess churn risk.' });
+  return recos;
+}
+
+/* ════════════════════════════════════════════════════════════
+   RESET
+════════════════════════════════════════════════════════════ */
+document.getElementById('predictNewBtn').addEventListener('click', () => {
+  // Hide result
+  document.getElementById('result').classList.remove('show');
+
+  // Reset form
+  form.reset();
+  selections.Gender = null;
+  selections.Country = null;
+  selections.SubscriptionType = null;
+  predictBtn.disabled = true;
+
+  // Reset notes
+  Object.entries(notes).forEach(([k, el]) => {
+    const defaults = {
+      Gender: '⬆ Pick a gender to continue',
+      Country: '⬆ Pick a country to continue',
+      SubscriptionType: '⬆ Pick a plan to continue',
+    };
+    el.textContent = defaults[k];
+    el.classList.remove('satisfied');
+  });
+
+  // Reset steps
+  ['step4'].forEach(id => {
+    document.getElementById(id).classList.remove('active','done');
+  });
+  document.getElementById('line3').classList.remove('done');
+
+  // Scroll up
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+});
+
+/* ════════════════════════════════════════════════════════════
+   TOAST
+════════════════════════════════════════════════════════════ */
+function showToast(msg, duration = 3000) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), duration);
+}
+
+/* ════════════════════════════════════════════════════════════
+   SERVICE WORKER REGISTRATION
+════════════════════════════════════════════════════════════ */
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('/static/sw.js')
+      .catch(() => {}); // silently fail if blocked
+  });
+}
+
+/* ════════════════════════════════════════════════════════════
+   ADD TO HOME SCREEN PROMPT (Android Chrome)
+════════════════════════════════════════════════════════════ */
+let deferredPrompt = null;
+const a2hsBar = document.getElementById('a2hsBar');
+const a2hsBtn = document.getElementById('a2hsBtn');
+const a2hsDismiss = document.getElementById('a2hsDismiss');
+
+window.addEventListener('beforeinstallprompt', e => {
+  e.preventDefault();
+  deferredPrompt = e;
+  if (a2hsBar) a2hsBar.classList.add('show');
+});
+
+if (a2hsBtn) {
+  a2hsBtn.addEventListener('click', async () => {
+    if (!deferredPrompt) return;
+    deferredPrompt.prompt();
+    const { outcome } = await deferredPrompt.userChoice;
+    deferredPrompt = null;
+    if (a2hsBar) a2hsBar.classList.remove('show');
+  });
+}
+
+if (a2hsDismiss) {
+  a2hsDismiss.addEventListener('click', () => {
+    if (a2hsBar) a2hsBar.classList.remove('show');
+  });
+}
+</script>
+</body>
+</html>
