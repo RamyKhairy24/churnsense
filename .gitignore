@@ -7,6 +7,7 @@ __pycache__/
 
 # Virtual environments
 churn_env/
+*.log
 .venv/
 venv/
 env/
