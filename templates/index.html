@@ -1059,6 +1059,387 @@ footer a:hover { text-decoration: underline; }
 }
 
 .a2hs-dismiss:hover { color: var(--text2); }
+
+/* ═══════════════════════════════════════════════════════════════════
+   SLIDER FIELDS
+═══════════════════════════════════════════════════════════════════ */
+.metrics-grid {
+  display: grid;
+  gap: clamp(16px, 3vw, 22px);
+  grid-template-columns: 1fr;
+}
+
+@media (min-width: 540px) {
+  .metrics-grid { grid-template-columns: 1fr 1fr; }
+}
+
+.slider-field, .counter-field {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: clamp(12px, 2.5vw, 16px);
+  transition: border-color 0.2s;
+}
+
+.slider-field:focus-within,
+.counter-field:focus-within { border-color: var(--border-hi); }
+
+.slider-header, .counter-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+
+.slider-lbl {
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: var(--text2);
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+
+.slider-val {
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: var(--a1);
+  background: rgba(124,111,255,0.1);
+  border-radius: 8px;
+  padding: 3px 9px;
+  min-width: 70px;
+  text-align: center;
+}
+
+input[type="range"].slider {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100%;
+  height: 6px;
+  border-radius: 99px;
+  outline: none;
+  cursor: pointer;
+  transition: opacity 0.2s;
+}
+
+input[type="range"].slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: var(--a1);
+  box-shadow: 0 2px 8px rgba(124,111,255,0.45);
+  cursor: pointer;
+  transition: transform 0.15s;
+}
+
+input[type="range"].slider:hover::-webkit-slider-thumb { transform: scale(1.15); }
+input[type="range"].slider::-moz-range-thumb {
+  width: 20px; height: 20px;
+  border-radius: 50%;
+  background: var(--a1);
+  border: none;
+  cursor: pointer;
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   COUNTER FIELDS
+═══════════════════════════════════════════════════════════════════ */
+.counter-ctrl {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  justify-content: center;
+  padding: 4px 0;
+}
+
+.cnt-btn {
+  width: 38px; height: 38px;
+  border-radius: 50%;
+  border: 1.5px solid var(--border);
+  background: var(--surface3);
+  color: var(--text);
+  font-size: 1.3rem;
+  line-height: 1;
+  cursor: pointer;
+  display: grid;
+  place-items: center;
+  transition: all 0.18s;
+  flex-shrink: 0;
+}
+
+.cnt-btn:hover:not(:disabled) {
+  border-color: var(--a1);
+  color: var(--a1);
+  background: rgba(124,111,255,0.1);
+  transform: scale(1.08);
+}
+
+.cnt-btn:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+
+.cnt-val {
+  font-size: 2rem;
+  font-weight: 900;
+  min-width: 50px;
+  text-align: center;
+  color: var(--text);
+  letter-spacing: -1px;
+  line-height: 1;
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   HISTORY DRAWER
+═══════════════════════════════════════════════════════════════════ */
+.hist-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.55);
+  z-index: 300;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s var(--ease);
+}
+
+.hist-backdrop.show { opacity: 1; pointer-events: all; }
+
+.hist-drawer {
+  position: fixed;
+  top: 0; right: 0;
+  width: min(400px, 100vw);
+  height: 100dvh;
+  background: var(--surface);
+  border-left: 1px solid var(--border);
+  z-index: 301;
+  transform: translateX(100%);
+  transition: transform 0.35s var(--ease);
+  display: flex;
+  flex-direction: column;
+  padding-top: var(--sat);
+  overflow: hidden;
+}
+
+.hist-drawer.open { transform: translateX(0); }
+
+.hist-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 16px 18px;
+  border-bottom: 1px solid var(--border);
+  font-weight: 700;
+  font-size: 0.95rem;
+  flex-shrink: 0;
+}
+
+.hist-header h3 { font-size: 0.95rem; font-weight: 700; flex: 1; }
+
+.hist-clear {
+  font-size: 0.75rem;
+  color: var(--a2);
+  background: none;
+  border: 1px solid rgba(247,37,133,0.3);
+  border-radius: 7px;
+  padding: 4px 10px;
+  cursor: pointer;
+  font-family: inherit;
+  font-weight: 600;
+  transition: background 0.2s;
+}
+
+.hist-clear:hover { background: rgba(247,37,133,0.1); }
+
+.hist-list {
+  flex: 1;
+  overflow-y: auto;
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.hist-empty {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text3);
+  font-size: 0.85rem;
+  padding: 20px;
+  text-align: center;
+}
+
+.hist-item {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 12px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.hist-item-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.hist-badge {
+  font-size: 0.72rem;
+  font-weight: 700;
+  padding: 3px 8px;
+  border-radius: 6px;
+}
+
+.hist-badge.churn { background: rgba(247,37,133,0.15); color: var(--a2); }
+.hist-badge.safe  { background: rgba(46,194,126,0.15);  color: var(--success); }
+
+.hist-prob {
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--text2);
+  margin-left: auto;
+}
+
+.hist-time {
+  font-size: 0.72rem;
+  color: var(--text3);
+}
+
+.hist-item-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.hist-item-chips .chip {
+  font-size: 0.72rem;
+  padding: 3px 9px;
+}
+
+.hist-metrics {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  font-size: 0.72rem;
+  color: var(--text3);
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   SKELETON CARD
+═══════════════════════════════════════════════════════════════════ */
+.skeleton-card {
+  display: none;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: clamp(18px, 4vw, 26px);
+  overflow: hidden;
+  animation: slideUp 0.4s var(--spring);
+}
+
+.skeleton-card.show { display: block; }
+
+.skel-header {
+  padding: clamp(20px, 4vw, 28px);
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  border-bottom: 1px solid var(--border);
+  background: var(--surface2);
+}
+
+.skel-body {
+  padding: clamp(20px, 4vw, 28px);
+  display: flex;
+  gap: 20px;
+  align-items: flex-start;
+}
+
+.skel-right { flex: 1; padding-top: 10px; }
+
+.skel {
+  background: linear-gradient(90deg,
+    var(--surface2) 0%, var(--surface3) 50%, var(--surface2) 100%);
+  background-size: 200% 100%;
+  animation: shimmer 1.6s ease-in-out infinite;
+  border-radius: 8px;
+}
+
+.skel-circle  { width: 58px; height: 58px; border-radius: 50%; flex-shrink: 0; }
+.skel-lines   { flex: 1; }
+.skel-ring    { width: 130px; height: 130px; border-radius: 50%; flex-shrink: 0; }
+
+@keyframes shimmer {
+  0%   { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   RISK FACTORS
+═══════════════════════════════════════════════════════════════════ */
+.risk-factors {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: clamp(14px, 3vw, 18px);
+}
+
+.risk-title {
+  font-size: 0.8rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.7px;
+  color: var(--text2);
+  margin-bottom: 12px;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+
+.risk-list { display: flex; flex-direction: column; gap: 10px; }
+
+.risk-item { display: flex; flex-direction: column; gap: 5px; }
+
+.risk-item-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.82rem;
+}
+
+.risk-icon   { font-size: 1rem; flex-shrink: 0; }
+.risk-label  { font-weight: 700; color: var(--text); flex: 1; }
+.risk-detail { color: var(--text2); font-size: 0.78rem; }
+.risk-badge  { font-size: 0.7rem; font-weight: 700; margin-left: auto; }
+
+.risk-bar-track {
+  height: 4px;
+  background: var(--surface3);
+  border-radius: 99px;
+  overflow: hidden;
+}
+
+.risk-bar-fill {
+  height: 100%;
+  border-radius: 99px;
+  transition: width 0.8s var(--ease);
+}
+
+/* wide screen: risk factors + reco side by side */
+@media (min-width: 760px) {
+  .result-body {
+    grid-template-columns: auto 1fr;
+    grid-template-areas:
+      "ring  insights"
+      "ring  risk"
+      "reco  reco"
+      "chips chips";
+  }
+  .risk-factors { grid-area: risk; }
+}
   </style>
 </head>
 <body>
@@ -1074,9 +1455,24 @@ footer a:hover { text-decoration: underline; }
     <span class="logo-badge">AI</span>
   </div>
   <div class="header-right">
+    <button class="icon-btn" id="histBtn" aria-label="Prediction history" title="Prediction history">📋</button>
     <button class="icon-btn" id="themeBtn" aria-label="Toggle theme" title="Toggle theme">🌙</button>
   </div>
 </header>
+
+<!-- ══════════════════════════════════════════
+     HISTORY DRAWER
+══════════════════════════════════════════ -->
+<div class="hist-backdrop" id="histBackdrop"></div>
+<aside class="hist-drawer" id="histDrawer" aria-label="Prediction history">
+  <div class="hist-header">
+    <h3>📋 History</h3>
+    <button class="hist-clear" id="histClear">Clear all</button>
+    <button class="icon-btn" id="histClose" aria-label="Close history">✕</button>
+  </div>
+  <div class="hist-list" id="histList"></div>
+  <p class="hist-empty" id="histEmpty">No predictions yet.<br>Make your first prediction above.</p>
+</aside>
 
 <!-- ══════════════════════════════════════════
      MAIN
@@ -1085,7 +1481,7 @@ footer a:hover { text-decoration: underline; }
 
   <!-- Hero -->
   <div class="hero">
-    <div class="hero-eyebrow"><span class="dot"></span> Model Live · Gradient Boosting</div>
+    <div class="hero-eyebrow"><span class="dot"></span> Model Live · {{ meta.model_name }}</div>
     <h1>Will your customer<br><span class="grad-text">stay or leave?</span></h1>
     <p>Enter a customer profile below and get an instant AI-powered churn prediction with actionable insights.</p>
   </div>
@@ -1094,22 +1490,22 @@ footer a:hover { text-decoration: underline; }
   <div class="steps" id="stepBar" aria-label="Progress steps">
     <div class="step active" id="step1">
       <div class="step-num">1</div>
-      <div class="step-label">Gender</div>
+      <div class="step-label">Profile</div>
     </div>
     <div class="step-line" id="line1"></div>
-    <div class="step active" id="step2">
+    <div class="step" id="step2">
       <div class="step-num">2</div>
-      <div class="step-label">Country</div>
+      <div class="step-label">Location</div>
     </div>
     <div class="step-line" id="line2"></div>
-    <div class="step active" id="step3">
+    <div class="step" id="step3">
       <div class="step-num">3</div>
       <div class="step-label">Plan</div>
     </div>
     <div class="step-line" id="line3"></div>
     <div class="step" id="step4">
       <div class="step-num">4</div>
-      <div class="step-label">Result</div>
+      <div class="step-label">Predict</div>
     </div>
   </div>
 
@@ -1264,6 +1660,113 @@ footer a:hover { text-decoration: underline; }
 
     <div class="divider"></div>
 
+    <!-- ── Step 4: Contract Type ───────────────── -->
+    <div class="field-group" id="fg-contract">
+      <div class="section-label">
+        <div class="section-icon">📋</div>
+        <div>
+          <div class="section-title">Contract Type</div>
+          <div class="section-sub">Billing commitment period</div>
+        </div>
+      </div>
+
+      <div class="opt-grid two">
+        <label class="opt">
+          <input type="radio" name="ContractType" value="Monthly" />
+          <div class="opt-face">
+            <span class="emoji">📅</span>
+            <span class="label">Monthly</span>
+            <span class="desc">Pay month-to-month</span>
+          </div>
+        </label>
+        <label class="opt">
+          <input type="radio" name="ContractType" value="Annual" />
+          <div class="opt-face">
+            <span class="emoji">📋</span>
+            <span class="label">Annual</span>
+            <span class="desc">Yearly commitment</span>
+          </div>
+        </label>
+      </div>
+
+      <div class="req-note" id="note-contract">⬆ Pick a contract type to continue</div>
+    </div>
+
+    <div class="divider"></div>
+
+    <!-- ── Account Health (numeric) ───────────── -->
+    <div class="field-group" id="fg-metrics">
+      <div class="section-label">
+        <div class="section-icon">📊</div>
+        <div>
+          <div class="section-title">Account Health</div>
+          <div class="section-sub">Usage and billing metrics — adjust as needed</div>
+        </div>
+      </div>
+
+      <div class="metrics-grid">
+
+        <!-- Tenure slider -->
+        <div class="slider-field">
+          <div class="slider-header">
+            <span class="slider-lbl">⏱️ Tenure</span>
+            <span class="slider-val" id="val-TenureMonths">24 months</span>
+          </div>
+          <input type="range" class="slider" id="TenureMonths" min="1" max="72" value="24" step="1"
+                 data-unit="months" data-default="24" />
+        </div>
+
+        <!-- Monthly Charge slider -->
+        <div class="slider-field">
+          <div class="slider-header">
+            <span class="slider-lbl">💰 Monthly Charge</span>
+            <span class="slider-val" id="val-MonthlyCharge">$49</span>
+          </div>
+          <input type="range" class="slider" id="MonthlyCharge" min="0" max="100" value="49" step="1"
+                 data-prefix="$" data-default="49" />
+        </div>
+
+        <!-- Days Since Login slider -->
+        <div class="slider-field">
+          <div class="slider-header">
+            <span class="slider-lbl">📅 Days Since Login</span>
+            <span class="slider-val" id="val-DaysSinceLastLogin">14 days</span>
+          </div>
+          <input type="range" class="slider" id="DaysSinceLastLogin" min="0" max="365" value="14" step="1"
+                 data-unit="days" data-default="14" />
+        </div>
+
+        <!-- Support Tickets counter -->
+        <div class="counter-field">
+          <div class="counter-header">
+            <span class="slider-lbl">🎫 Support Tickets</span>
+          </div>
+          <div class="counter-ctrl">
+            <button type="button" class="cnt-btn minus" data-field="SupportTickets" aria-label="Decrease">−</button>
+            <span class="cnt-val" id="val-SupportTickets">1</span>
+            <button type="button" class="cnt-btn plus"  data-field="SupportTickets" aria-label="Increase">+</button>
+          </div>
+          <input type="hidden" id="SupportTickets" value="1" min="0" max="8" data-default="1" />
+        </div>
+
+        <!-- Payment Failures counter -->
+        <div class="counter-field">
+          <div class="counter-header">
+            <span class="slider-lbl">💳 Payment Failures</span>
+          </div>
+          <div class="counter-ctrl">
+            <button type="button" class="cnt-btn minus" data-field="PaymentFailures" aria-label="Decrease">−</button>
+            <span class="cnt-val" id="val-PaymentFailures">0</span>
+            <button type="button" class="cnt-btn plus"  data-field="PaymentFailures" aria-label="Increase">+</button>
+          </div>
+          <input type="hidden" id="PaymentFailures" value="0" min="0" max="5" data-default="0" />
+        </div>
+
+      </div>
+    </div>
+
+    <div class="divider"></div>
+
     <!-- ── Predict button ──────────────────────── -->
     <button type="submit" class="predict-btn" id="predictBtn" disabled>
       <span class="btn-icon">🔮</span>
@@ -1274,7 +1777,25 @@ footer a:hover { text-decoration: underline; }
   </form>
   <!-- /form-card -->
 
-  <!-- ── RESULT ──────────────────────────────────── -->
+  <!-- ── SKELETON ────────────────────────────────── -->
+  <div class="skeleton-card" id="skeletonCard" aria-hidden="true">
+    <div class="skel-header">
+      <div class="skel skel-circle"></div>
+      <div class="skel-lines">
+        <div class="skel" style="height:20px;width:160px;margin-bottom:10px"></div>
+        <div class="skel" style="height:14px;width:110px"></div>
+      </div>
+    </div>
+    <div class="skel-body">
+      <div class="skel skel-ring"></div>
+      <div class="skel-right">
+        <div class="skel" style="height:13px;width:90%;margin-bottom:10px"></div>
+        <div class="skel" style="height:13px;width:65%;margin-bottom:10px"></div>
+        <div class="skel" style="height:13px;width:80%;margin-bottom:10px"></div>
+        <div class="skel" style="height:13px;width:55%"></div>
+      </div>
+    </div>
+  </div>
   <div id="result" role="region" aria-live="polite" aria-label="Prediction result">
 
     <div class="result-card">
@@ -1318,6 +1839,9 @@ footer a:hover { text-decoration: underline; }
           <ul class="reco-list" id="recoList"></ul>
         </div>
 
+        <!-- Risk Signal Analysis (new) -->
+        <div class="risk-factors" id="riskFactors"></div>
+
         <!-- Summary chips -->
         <div class="summary-section">
           <div class="req-note satisfied" style="margin-bottom:10px">✓ Prediction based on this profile:</div>
@@ -1332,6 +1856,7 @@ footer a:hover { text-decoration: underline; }
         <button class="btn-new" id="predictNewBtn">
           ← Predict another customer
         </button>
+        <button class="btn-secondary" id="viewHistBtn">📋 History</button>
       </div>
 
     </div>
@@ -1341,16 +1866,16 @@ footer a:hover { text-decoration: underline; }
   <!-- Stats bar -->
   <div class="stats-bar">
     <div class="stat-tile">
-      <div class="stat-num">1,000</div>
+      <div class="stat-num">3,000</div>
       <div class="stat-lbl">Training Samples</div>
     </div>
     <div class="stat-tile">
-      <div class="stat-num">3</div>
+      <div class="stat-num">9</div>
       <div class="stat-lbl">Features Used</div>
     </div>
     <div class="stat-tile">
-      <div class="stat-num">GB</div>
-      <div class="stat-lbl">Gradient Boosting</div>
+      <div class="stat-num">0.79</div>
+      <div class="stat-lbl">AUC Score</div>
     </div>
   </div>
 
@@ -1359,9 +1884,9 @@ footer a:hover { text-decoration: underline; }
 <footer>
   <span>© 2026 ChurnSense</span>
   <span class="footer-dot">·</span>
-  <span>Powered by Gradient Boosting + Flask</span>
+  <span>Powered by {{ meta.model_name }} + Flask</span>
   <span class="footer-dot">·</span>
-  <span>scikit-learn</span>
+  <span>scikit-learn · AUC 0.79</span>
 </footer>
 
 </div><!-- /page -->
@@ -1386,301 +1911,511 @@ footer a:hover { text-decoration: underline; }
 ════════════════════════════════════════════════════════════ */
 const html     = document.documentElement;
 const themeBtn = document.getElementById('themeBtn');
-
 let theme = localStorage.getItem('cs-theme') || 'dark';
 applyTheme(theme);
-
 themeBtn.addEventListener('click', () => {
-  theme = theme === 'dark' ? 'light' : 'dark';
+  theme = (theme === 'dark') ? 'light' : 'dark';
   applyTheme(theme);
   localStorage.setItem('cs-theme', theme);
 });
-
 function applyTheme(t) {
-  html.dataset.theme    = t;
-  themeBtn.textContent  = t === 'dark' ? '🌙' : '☀️';
+  html.dataset.theme   = t;
+  themeBtn.textContent = t === 'dark' ? '🌙' : '☀️';
 }
 
 /* ════════════════════════════════════════════════════════════
-   COUNTRY / SUBSCRIPTION ICONS (for chips)
+   ICONS MAP
 ════════════════════════════════════════════════════════════ */
 const ICONS = {
-  Female: '👩', Male: '👨',
-  Canada: '🇨🇦', Egypt: '🇪🇬', Germany: '🇩🇪',
-  India: '🇮🇳', UK: '🇬🇧', USA: '🇺🇸',
-  Basic: '📦', Free: '🎁', Premium: '👑'
+  Female:'👩', Male:'👨',
+  Canada:'🇨🇦', Egypt:'🇪🇬', Germany:'🇩🇪', India:'🇮🇳', UK:'🇬🇧', USA:'🇺🇸',
+  Basic:'📦', Free:'🎁', Premium:'👑',
+  Monthly:'📅', Annual:'📋',
 };
 
 /* ════════════════════════════════════════════════════════════
-   STEP + VALIDATION TRACKING
+   HISTORY MANAGEMENT
 ════════════════════════════════════════════════════════════ */
-const form = document.getElementById('churnForm');
+const HIST_KEY = 'cs-history';
+const FORM_KEY = 'cs-last-form';
+
+function loadHistory() {
+  try { return JSON.parse(localStorage.getItem(HIST_KEY) || '[]'); }
+  catch { return []; }
+}
+
+function pushHistory(entry) {
+  const hist = loadHistory();
+  hist.unshift(entry);
+  if (hist.length > 10) hist.pop();
+  localStorage.setItem(HIST_KEY, JSON.stringify(hist));
+}
+
+function timeAgo(ts) {
+  const s = Math.floor((Date.now() - ts) / 1000);
+  if (s < 60)    return 'just now';
+  if (s < 3600)  return Math.floor(s / 60) + 'm ago';
+  if (s < 86400) return Math.floor(s / 3600) + 'h ago';
+  return Math.floor(s / 86400) + 'd ago';
+}
+
+function emojiSpan(e) {
+  return `<span style="font-family:'Apple Color Emoji','Noto Color Emoji','Segoe UI Emoji',sans-serif">${e}</span>`;
+}
+
+function renderHistory() {
+  const hist  = loadHistory();
+  const list  = document.getElementById('histList');
+  const empty = document.getElementById('histEmpty');
+  if (!list) return;
+  if (hist.length === 0) {
+    list.innerHTML = '';
+    empty.style.display = '';
+    return;
+  }
+  empty.style.display = 'none';
+  list.innerHTML = hist.map(e => {
+    const cats = ['Gender','Country','SubscriptionType','ContractType'];
+    const chips = cats.map(f =>
+      `<span class="chip">${emojiSpan(ICONS[e.inputs[f]] || '')} ${e.inputs[f]}</span>`
+    ).join('');
+    return `
+      <div class="hist-item">
+        <div class="hist-item-head">
+          <span class="hist-badge ${e.churn ? 'churn' : 'safe'}">${e.churn ? '⚠️ Churn' : '✅ Safe'}</span>
+          <span class="hist-prob">${e.probability}%</span>
+          <span class="hist-time">${timeAgo(e.timestamp)}</span>
+        </div>
+        <div class="hist-item-chips">${chips}</div>
+        <div class="hist-metrics">
+          <span>⏱️ ${e.inputs.TenureMonths}mo</span>
+          <span>💰 $${e.inputs.MonthlyCharge}</span>
+          <span>🎫 ${e.inputs.SupportTickets} tickets</span>
+          <span>📅 ${e.inputs.DaysSinceLastLogin}d inactive</span>
+          <span>💳 ${e.inputs.PaymentFailures} failures</span>
+        </div>
+      </div>`;
+  }).join('');
+}
+
+const histBtn      = document.getElementById('histBtn');
+const histBackdrop = document.getElementById('histBackdrop');
+const histDrawer   = document.getElementById('histDrawer');
+const histClose    = document.getElementById('histClose');
+const histClear    = document.getElementById('histClear');
+const viewHistBtn  = document.getElementById('viewHistBtn');
+
+function openHist()  { renderHistory(); histDrawer.classList.add('open'); histBackdrop.classList.add('show'); }
+function closeHist() { histDrawer.classList.remove('open'); histBackdrop.classList.remove('show'); }
+
+if (histBtn)      histBtn.addEventListener('click', openHist);
+if (viewHistBtn)  viewHistBtn.addEventListener('click', openHist);
+if (histClose)    histClose.addEventListener('click', closeHist);
+if (histBackdrop) histBackdrop.addEventListener('click', closeHist);
+if (histClear) {
+  histClear.addEventListener('click', () => {
+    localStorage.removeItem(HIST_KEY);
+    renderHistory();
+  });
+}
+
+/* ════════════════════════════════════════════════════════════
+   SLIDER FILL
+════════════════════════════════════════════════════════════ */
+function updateSliderFill(el) {
+  const pct = ((el.value - el.min) / (el.max - el.min)) * 100;
+  el.style.background =
+    `linear-gradient(to right, var(--a1) ${pct}%, var(--surface3) ${pct}%)`;
+}
+
+document.querySelectorAll('.slider').forEach(sl => {
+  updateSliderFill(sl);
+  sl.addEventListener('input', () => {
+    updateSliderFill(sl);
+    const valEl = document.getElementById('val-' + sl.id);
+    if (!valEl) return;
+    const prefix = sl.dataset.prefix || '';
+    const unit   = sl.dataset.unit   || '';
+    valEl.textContent = prefix + sl.value + (unit ? '\u00a0' + unit : '');
+  });
+});
+
+/* ════════════════════════════════════════════════════════════
+   COUNTER (stepper) CONTROLS
+════════════════════════════════════════════════════════════ */
+document.querySelectorAll('.cnt-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const fieldId  = btn.dataset.field;
+    const input    = document.getElementById(fieldId);
+    const valEl    = document.getElementById('val-' + fieldId);
+    const mn = parseInt(input.min), mx = parseInt(input.max);
+    let   val = parseInt(input.value);
+    if (btn.classList.contains('minus') && val > mn) val--;
+    if (btn.classList.contains('plus')  && val < mx) val++;
+    input.value = val;
+    if (valEl) valEl.textContent = val;
+    const ctrl = btn.closest('.counter-ctrl');
+    ctrl.querySelector('.minus').disabled = val <= mn;
+    ctrl.querySelector('.plus').disabled  = val >= mx;
+  });
+});
+
+// Init disabled states
+document.querySelectorAll('.counter-ctrl').forEach(ctrl => {
+  const fieldId = ctrl.querySelector('.cnt-btn').dataset.field;
+  const input   = document.getElementById(fieldId);
+  if (!input) return;
+  ctrl.querySelector('.minus').disabled = parseInt(input.value) <= parseInt(input.min);
+  ctrl.querySelector('.plus').disabled  = parseInt(input.value) >= parseInt(input.max);
+});
+
+/* ════════════════════════════════════════════════════════════
+   VALIDATION + STEP BAR
+════════════════════════════════════════════════════════════ */
+const form       = document.getElementById('churnForm');
 const predictBtn = document.getElementById('predictBtn');
 
-const selections = { Gender: null, Country: null, SubscriptionType: null };
+const selections = { Gender: null, Country: null, SubscriptionType: null, ContractType: null };
 
 const notes = {
   Gender:           document.getElementById('note-gender'),
   Country:          document.getElementById('note-country'),
   SubscriptionType: document.getElementById('note-sub'),
+  ContractType:     document.getElementById('note-contract'),
 };
 
-form.querySelectorAll('input[type="radio"]').forEach(radio => {
-  radio.addEventListener('change', () => {
-    selections[radio.name] = radio.value;
-    // Update note
-    const note = notes[radio.name];
-    note.textContent = '✓ Selected: ' + radio.value;
-    note.classList.add('satisfied');
-    // Check if all done
-    checkReady();
-  });
+function onRadioChange(radio) {
+  selections[radio.name] = radio.value;
+  const note = notes[radio.name];
+  if (note) { note.textContent = '✓ ' + radio.value; note.classList.add('satisfied'); }
+  checkReady();
+}
+
+form.querySelectorAll('input[type="radio"]').forEach(r => {
+  r.addEventListener('change', () => onRadioChange(r));
 });
 
 function checkReady() {
-  const allDone = Object.values(selections).every(v => v !== null);
-  predictBtn.disabled = !allDone;
+  const s1 = !!selections.Gender;
+  const s2 = !!selections.Country;
+  const s3 = !!(selections.SubscriptionType && selections.ContractType);
+  const all = s1 && s2 && s3;
+  predictBtn.disabled = !all;
 
-  // Update step 4
-  const step4 = document.getElementById('step4');
-  if (allDone) {
-    step4.classList.add('active');
-    document.getElementById('line3').classList.add('done');
-  }
+  const setStep = (id, cls) => { const e = document.getElementById(id); if (e) e.className = 'step ' + cls; };
+  const setLine = (id, done) => { const e = document.getElementById(id); if (e) e.className = 'step-line ' + (done ? 'done' : ''); };
+
+  setStep('step1', s1 ? 'done' : 'active');      setLine('line1', s1);
+  setStep('step2', s1 ? (s2 ? 'done' : 'active') : ''); setLine('line2', s2);
+  setStep('step3', s2 ? (s3 ? 'done' : 'active') : ''); setLine('line3', s3);
+  setStep('step4', s3 ? 'active' : '');
+}
+
+checkReady();
+
+/* ════════════════════════════════════════════════════════════
+   FORM STATE — RESTORE ON LOAD
+════════════════════════════════════════════════════════════ */
+const lastForm = (() => { try { return JSON.parse(localStorage.getItem(FORM_KEY) || 'null'); } catch { return null; } })();
+
+if (lastForm) {
+  ['Gender','Country','SubscriptionType','ContractType'].forEach(field => {
+    const val = lastForm[field];
+    if (!val) return;
+    const r = form.querySelector(`input[name="${field}"][value="${CSS.escape(val)}"]`);
+    if (r) { r.checked = true; onRadioChange(r); }
+  });
+  ['TenureMonths','MonthlyCharge','DaysSinceLastLogin'].forEach(id => {
+    if (!(id in lastForm)) return;
+    const el = document.getElementById(id);
+    const ve = document.getElementById('val-' + id);
+    if (!el) return;
+    el.value = lastForm[id];
+    updateSliderFill(el);
+    if (ve) {
+      const p = el.dataset.prefix || '', u = el.dataset.unit || '';
+      ve.textContent = p + el.value + (u ? '\u00a0' + u : '');
+    }
+  });
+  ['SupportTickets','PaymentFailures'].forEach(id => {
+    if (!(id in lastForm)) return;
+    const el = document.getElementById(id);
+    const ve = document.getElementById('val-' + id);
+    if (!el) return;
+    el.value = lastForm[id];
+    if (ve) ve.textContent = lastForm[id];
+  });
 }
 
 /* ════════════════════════════════════════════════════════════
-   PREDICTION
+   PREDICT — SUBMIT
 ════════════════════════════════════════════════════════════ */
 form.addEventListener('submit', async (e) => {
   e.preventDefault();
   if (predictBtn.disabled) return;
 
+  const inputs = {
+    Gender:             selections.Gender,
+    Country:            selections.Country,
+    SubscriptionType:   selections.SubscriptionType,
+    ContractType:       selections.ContractType,
+    TenureMonths:       parseInt(document.getElementById('TenureMonths').value),
+    MonthlyCharge:      parseFloat(document.getElementById('MonthlyCharge').value),
+    SupportTickets:     parseInt(document.getElementById('SupportTickets').value),
+    DaysSinceLastLogin: parseInt(document.getElementById('DaysSinceLastLogin').value),
+    PaymentFailures:    parseInt(document.getElementById('PaymentFailures').value),
+  };
+
+  localStorage.setItem(FORM_KEY, JSON.stringify(inputs));
   predictBtn.classList.add('loading');
   predictBtn.disabled = true;
+  document.getElementById('result').classList.remove('show');
+  const skel = document.getElementById('skeletonCard');
+  skel.classList.add('show');
+  skel.scrollIntoView({ behavior: 'smooth', block: 'start' });
 
   try {
     const res  = await fetch('/predict', {
-      method: 'POST',
+      method:  'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        Gender:           selections.Gender,
-        Country:          selections.Country,
-        SubscriptionType: selections.SubscriptionType,
-      })
+      body:    JSON.stringify(inputs),
     });
-
     const data = await res.json();
     if (data.error) throw new Error(data.error);
-    renderResult(data);
+
+    pushHistory({ timestamp: Date.now(), churn: data.churn, probability: data.probability, inputs });
+    renderResult(data, inputs);
 
   } catch (err) {
     showToast('⚠️ ' + err.message);
   } finally {
     predictBtn.classList.remove('loading');
     predictBtn.disabled = false;
+    skel.classList.remove('show');
   }
 });
 
 /* ════════════════════════════════════════════════════════════
    RENDER RESULT
 ════════════════════════════════════════════════════════════ */
-function renderResult({ churn, probability }) {
+function renderResult({ churn, probability }, inputs) {
   const isChurn = churn === 1;
   const pct     = probability;
 
-  /* header */
-  const header = document.getElementById('resultHeader');
-  const iconWrap  = document.getElementById('resultIconWrap');
-  const icon      = document.getElementById('resultIcon');
-  const verdict   = document.getElementById('resultVerdict');
-  const sub       = document.getElementById('resultSub');
+  // Tab title
+  document.title = isChurn ? '⚠️ High Risk — ChurnSense' : '✅ Low Risk — ChurnSense';
 
-  header.className    = 'result-header ' + (isChurn ? 'churn' : 'safe');
-  iconWrap.className  = 'result-icon-wrap ' + (isChurn ? 'churn' : 'safe');
-  icon.textContent    = isChurn ? '⚠️' : '✅';
-
+  // Header strip
+  document.getElementById('resultHeader').className  = 'result-header ' + (isChurn ? 'churn' : 'safe');
+  document.getElementById('resultIconWrap').className = 'result-icon-wrap ' + (isChurn ? 'churn' : 'safe');
+  document.getElementById('resultIcon').textContent   = isChurn ? '⚠️' : '✅';
+  const verdict = document.getElementById('resultVerdict');
   verdict.className   = 'result-verdict ' + (isChurn ? 'churn' : 'safe');
   verdict.textContent = isChurn ? 'High Churn Risk' : 'Low Churn Risk';
-
-  sub.textContent = isChurn
+  document.getElementById('resultSub').textContent = isChurn
     ? 'This customer is predicted to churn — action is recommended.'
     : 'This customer is predicted to stay — keep up the great experience!';
 
-  /* ring */
-  const circumference = 2 * Math.PI * 54; // ≈ 339.29
-
+  // Ring gauge
+  const C         = 2 * Math.PI * 54;
   const ringChurn = document.getElementById('ringChurn');
   const ringSafe  = document.getElementById('ringSafe');
-
   ringChurn.style.display = 'none';
   ringSafe.style.display  = 'none';
-
-  const activeRing = isChurn ? ringChurn : ringSafe;
-  activeRing.style.display = '';
-
-  // Reset then animate
-  activeRing.style.strokeDashoffset = circumference;
+  const ring = isChurn ? ringChurn : ringSafe;
+  ring.style.display = '';
+  ring.style.strokeDashoffset = C;
   requestAnimationFrame(() => requestAnimationFrame(() => {
-    activeRing.style.strokeDashoffset = circumference * (1 - pct / 100);
+    ring.style.strokeDashoffset = C * (1 - pct / 100);
   }));
+  const rp = document.getElementById('ringPct');
+  rp.className   = 'ring-pct ' + (isChurn ? 'churn' : 'safe');
+  rp.textContent = pct + '%';
 
-  const ringPct = document.getElementById('ringPct');
-  ringPct.className   = 'ring-pct ' + (isChurn ? 'churn' : 'safe');
-  ringPct.textContent = pct + '%';
+  // Caption
+  const captions = [
+    [70, 'Very high probability — immediate attention needed.'],
+    [55, 'Above average churn probability — engage proactively.'],
+    [45, 'Near the borderline — worth monitoring closely.'],
+    [ 0, 'Low churn probability — customer appears loyal.'],
+  ];
+  document.getElementById('probCaption').textContent =
+    captions.find(([t]) => pct >= t)[1];
 
-  /* prob caption */
-  const caption = document.getElementById('probCaption');
-  if (pct >= 65)      caption.textContent = 'Very high probability — immediate attention needed.';
-  else if (pct >= 50) caption.textContent = 'Above average churn probability — monitor closely.';
-  else if (pct >= 40) caption.textContent = 'Near the threshold — worth keeping an eye on.';
-  else                caption.textContent = 'Low churn probability — customer appears loyal.';
+  // Risk signal analysis
+  renderRiskFactors(inputs);
 
-  /* insight row */
-  const insightRow = document.getElementById('insightRow');
-  insightRow.innerHTML = [
-    { icon: ICONS[selections.Gender],           label: 'Gender',       val: selections.Gender },
-    { icon: ICONS[selections.Country],          label: 'Country',      val: selections.Country },
-    { icon: ICONS[selections.SubscriptionType], label: 'Plan',         val: selections.SubscriptionType },
-    { icon: isChurn ? '🔴' : '🟢',              label: 'Prediction',   val: isChurn ? 'Churn' : 'Retained' },
-  ].map(p => `
+  // Insight pills (4 categoricals)
+  document.getElementById('insightRow').innerHTML = [
+    { key: 'Gender',           label: 'Gender'   },
+    { key: 'Country',          label: 'Country'  },
+    { key: 'SubscriptionType', label: 'Plan'     },
+    { key: 'ContractType',     label: 'Contract' },
+  ].map(({ key, label }) => `
     <div class="insight-pill">
-      <span class="pi-icon">${p.icon}</span>
+      <span class="pi-icon">${emojiSpan(ICONS[inputs[key]] || '')}</span>
       <div class="pi-text">
-        <div class="pi-label">${p.label}</div>
-        <div class="pi-val">${p.val}</div>
+        <div class="pi-label">${label}</div>
+        <div class="pi-val">${inputs[key]}</div>
       </div>
-    </div>
-  `).join('');
+    </div>`).join('');
 
-  /* recommendations */
-  const recoList = document.getElementById('recoList');
-  const recos = isChurn
-    ? getChurnRecos(selections)
-    : getSafeRecos(selections);
+  // Recommendations
+  document.getElementById('recoList').innerHTML = getRecos(inputs, isChurn)
+    .map(r => `<li><span class="ri">${r.icon}</span> ${r.text}</li>`).join('');
 
-  recoList.innerHTML = recos.map(r =>
-    `<li><span class="ri">${r.icon}</span> ${r.text}</li>`
-  ).join('');
+  // Summary chips (all 9 features)
+  const allChips = [
+    { icon: ICONS[inputs.Gender],           val: inputs.Gender },
+    { icon: ICONS[inputs.Country],          val: inputs.Country },
+    { icon: ICONS[inputs.SubscriptionType], val: inputs.SubscriptionType },
+    { icon: ICONS[inputs.ContractType],     val: inputs.ContractType },
+    { icon: '⏱️', val: inputs.TenureMonths + ' mo' },
+    { icon: '💰', val: '$' + inputs.MonthlyCharge },
+    { icon: '🎫', val: inputs.SupportTickets + (inputs.SupportTickets === 1 ? ' ticket' : ' tickets') },
+    { icon: '📅', val: inputs.DaysSinceLastLogin + 'd inactive' },
+    { icon: '💳', val: inputs.PaymentFailures + (inputs.PaymentFailures === 1 ? ' failure' : ' failures') },
+  ];
+  document.getElementById('summaryChips').innerHTML = allChips
+    .map(c => `<div class="chip">${emojiSpan(c.icon)} <span>${c.val}</span></div>`).join('');
 
-  /* summary chips */
-  const chips = document.getElementById('summaryChips');
-  chips.innerHTML = ['Gender','Country','SubscriptionType'].map(f => `
-    <div class="chip">
-      <span class="chip-e">${ICONS[selections[f]]}</span>
-      <span>${selections[f]}</span>
-    </div>
-  `).join('');
-
-  /* show */
-  const resultEl = document.getElementById('result');
-  resultEl.classList.add('show');
-
-  /* mark step 4 done */
+  // Reveal
+  document.getElementById('result').classList.add('show');
   document.getElementById('step4').classList.add('done');
+  setTimeout(() => document.getElementById('result').scrollIntoView({ behavior: 'smooth', block: 'start' }), 120);
+}
 
-  /* scroll to result */
-  setTimeout(() => {
-    resultEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
-  }, 120);
+/* ════════════════════════════════════════════════════════════
+   RISK SIGNAL ANALYSIS
+════════════════════════════════════════════════════════════ */
+function renderRiskFactors(inputs) {
+  const el = document.getElementById('riskFactors');
+  if (!el) return;
+
+  const factors = [
+    { icon: '💳', label: 'Payment Failures',  detail: inputs.PaymentFailures + (inputs.PaymentFailures === 1 ? ' failure' : ' failures'), score: Math.min(inputs.PaymentFailures / 5, 1),  level: inputs.PaymentFailures >= 2 ? 'high' : inputs.PaymentFailures > 0 ? 'med' : 'low' },
+    { icon: '🎫', label: 'Support Tickets',   detail: inputs.SupportTickets   + (inputs.SupportTickets   === 1 ? ' ticket' : ' tickets'),       score: Math.min(inputs.SupportTickets / 8, 1),   level: inputs.SupportTickets >= 4 ? 'high' : inputs.SupportTickets >= 2 ? 'med' : 'low'  },
+    { icon: '📅', label: 'Days Since Login',  detail: inputs.DaysSinceLastLogin + ' days',  score: Math.min(inputs.DaysSinceLastLogin / 180, 1), level: inputs.DaysSinceLastLogin > 60 ? 'high' : inputs.DaysSinceLastLogin > 14 ? 'med' : 'low' },
+    { icon: '📋', label: 'Contract Type',     detail: inputs.ContractType,   score: inputs.ContractType === 'Monthly' ? 0.65 : 0.18, level: inputs.ContractType === 'Monthly' ? 'med' : 'low' },
+    { icon: '⏱️', label: 'Tenure',            detail: inputs.TenureMonths + ' months',      score: Math.max(0, 1 - inputs.TenureMonths / 72), level: inputs.TenureMonths < 6 ? 'high' : inputs.TenureMonths < 18 ? 'med' : 'low' },
+  ];
+
+  const orderMap = { high: 0, med: 1, low: 2 };
+  factors.sort((a, b) => orderMap[a.level] - orderMap[b.level]);
+  const top4 = factors.slice(0, 4);
+
+  const colorMap = { high: 'var(--danger)', med: 'var(--warn)', low: 'var(--success)' };
+
+  el.innerHTML = `
+    <h4 class="risk-title">📊 Risk Signal Analysis</h4>
+    <div class="risk-list">
+      ${top4.map(f => `
+        <div class="risk-item">
+          <div class="risk-item-head">
+            <span class="risk-icon">${f.icon}</span>
+            <span class="risk-label">${f.label}</span>
+            <span class="risk-detail">${f.detail}</span>
+            <span class="risk-badge" style="color:${colorMap[f.level]}">${f.level.charAt(0).toUpperCase() + f.level.slice(1)}</span>
+          </div>
+          <div class="risk-bar-track">
+            <div class="risk-bar-fill" style="width:${Math.round(f.score * 100)}%;background:${colorMap[f.level]}"></div>
+          </div>
+        </div>`).join('')}
+    </div>`;
 }
 
 /* ════════════════════════════════════════════════════════════
    RECOMMENDATIONS
 ════════════════════════════════════════════════════════════ */
-function getChurnRecos({ SubscriptionType, Country }) {
-  const recos = [
-    { icon: '📧', text: 'Send a personalised re-engagement email within 48 hours.' },
-    { icon: '🎯', text: 'Offer a targeted discount or loyalty reward to increase retention.' },
-  ];
-
-  if (SubscriptionType === 'Free') {
-    recos.push({ icon: '⬆️', text: 'Highlight Premium features — free users churn when they see limited value.' });
-  } else if (SubscriptionType === 'Basic') {
-    recos.push({ icon: '🔓', text: 'Offer a trial upgrade to showcase the full experience.' });
+function getRecos(inputs, isChurn) {
+  const r = [];
+  if (isChurn) {
+    r.push({ icon: '📧', text: 'Send a personalised re-engagement email within 48 hours.' });
+    if (inputs.PaymentFailures > 0)
+      r.push({ icon: '💳', text: 'Address payment issues — offer a grace period or payment plan.' });
+    if (inputs.ContractType === 'Monthly')
+      r.push({ icon: '📋', text: 'Offer a discounted annual plan to reduce monthly churn likelihood.' });
+    if (inputs.SubscriptionType === 'Free')
+      r.push({ icon: '⬆️', text: 'Highlight Premium features — free users need clear upgrade incentives.' });
+    else r.push({ icon: '🎯', text: 'Offer a targeted discount or loyalty reward to retain the customer.' });
+    r.push({ icon: '📊', text: 'Tag for churn-risk monitoring — follow up in 7 days.' });
   } else {
-    recos.push({ icon: '💎', text: 'Even Premium users churn — check support tickets and satisfaction scores.' });
+    r.push({ icon: '✨', text: 'Keep delivering consistent value — this customer is engaged.' });
+    r.push({ icon: '⭐', text: 'Ask for a review or referral while satisfaction is high.' });
+    if (inputs.SubscriptionType === 'Free')
+      r.push({ icon: '🚀', text: 'Great time to nudge toward a paid plan.' });
+    else if (inputs.SubscriptionType === 'Basic')
+      r.push({ icon: '📈', text: 'Introduce Premium features to increase upgrade likelihood.' });
+    else r.push({ icon: '🏆', text: 'Reward loyalty — consider a VIP perk or early-access feature.' });
+    r.push({ icon: '🔁', text: 'Reassess churn risk in 30 days.' });
   }
-
-  recos.push({ icon: '📊', text: 'Add this customer to a churn-risk segment for dedicated follow-up.' });
-  return recos;
-}
-
-function getSafeRecos({ SubscriptionType }) {
-  const recos = [
-    { icon: '✨', text: 'Keep delivering consistent value — this customer is engaged.' },
-    { icon: '⭐', text: 'Ask for a review or referral while satisfaction is high.' },
-  ];
-
-  if (SubscriptionType === 'Free') {
-    recos.push({ icon: '🚀', text: 'Nudge toward a paid plan — free users can still be converted.' });
-  } else if (SubscriptionType === 'Basic') {
-    recos.push({ icon: '📈', text: 'Introduce Premium features gradually to increase upgrade likelihood.' });
-  } else {
-    recos.push({ icon: '🏆', text: 'Reward loyalty — consider a VIP perk or early-access feature.' });
-  }
-
-  recos.push({ icon: '🔁', text: 'Set a follow-up reminder in 30 days to reassess churn risk.' });
-  return recos;
+  return r.slice(0, 4);
 }
 
 /* ════════════════════════════════════════════════════════════
    RESET
 ════════════════════════════════════════════════════════════ */
 document.getElementById('predictNewBtn').addEventListener('click', () => {
-  // Hide result
   document.getElementById('result').classList.remove('show');
-
-  // Reset form
+  document.title = 'ChurnSense — Customer Churn Predictor';
   form.reset();
-  selections.Gender = null;
-  selections.Country = null;
-  selections.SubscriptionType = null;
+
+  selections.Gender = selections.Country = selections.SubscriptionType = selections.ContractType = null;
   predictBtn.disabled = true;
 
-  // Reset notes
+  const defaults = {
+    Gender: '⬆ Pick a gender to continue', Country: '⬆ Pick a country to continue',
+    SubscriptionType: '⬆ Pick a plan to continue', ContractType: '⬆ Pick a contract type to continue',
+  };
   Object.entries(notes).forEach(([k, el]) => {
-    const defaults = {
-      Gender: '⬆ Pick a gender to continue',
-      Country: '⬆ Pick a country to continue',
-      SubscriptionType: '⬆ Pick a plan to continue',
-    };
-    el.textContent = defaults[k];
-    el.classList.remove('satisfied');
+    if (el) { el.textContent = defaults[k]; el.classList.remove('satisfied'); }
   });
 
-  // Reset steps
-  ['step4'].forEach(id => {
-    document.getElementById(id).classList.remove('active','done');
+  // Reset sliders
+  document.querySelectorAll('.slider').forEach(sl => {
+    sl.value = sl.dataset.default || sl.value;
+    updateSliderFill(sl);
+    const ve = document.getElementById('val-' + sl.id);
+    if (ve) {
+      const p = sl.dataset.prefix || '', u = sl.dataset.unit || '';
+      ve.textContent = p + sl.value + (u ? '\u00a0' + u : '');
+    }
   });
-  document.getElementById('line3').classList.remove('done');
 
-  // Scroll up
+  // Reset counters
+  ['SupportTickets', 'PaymentFailures'].forEach(id => {
+    const inp = document.getElementById(id);
+    const ve  = document.getElementById('val-' + id);
+    if (!inp) return;
+    inp.value = inp.dataset.default || '0';
+    if (ve) ve.textContent = inp.value;
+  });
+
+  checkReady();
   window.scrollTo({ top: 0, behavior: 'smooth' });
 });
 
 /* ════════════════════════════════════════════════════════════
    TOAST
 ════════════════════════════════════════════════════════════ */
-function showToast(msg, duration = 3000) {
+function showToast(msg, dur = 3500) {
   const t = document.getElementById('toast');
   t.textContent = msg;
   t.classList.add('show');
-  setTimeout(() => t.classList.remove('show'), duration);
+  setTimeout(() => t.classList.remove('show'), dur);
 }
 
 /* ════════════════════════════════════════════════════════════
-   SERVICE WORKER REGISTRATION
+   SERVICE WORKER
 ════════════════════════════════════════════════════════════ */
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
-    navigator.serviceWorker.register('/static/sw.js')
-      .catch(() => {}); // silently fail if blocked
+    navigator.serviceWorker.register('/static/sw.js').catch(() => {});
   });
 }
 
 /* ════════════════════════════════════════════════════════════
-   ADD TO HOME SCREEN PROMPT (Android Chrome)
+   ADD TO HOME SCREEN (Android Chrome)
 ════════════════════════════════════════════════════════════ */
 let deferredPrompt = null;
 const a2hsBar = document.getElementById('a2hsBar');
@@ -1709,5 +2444,6 @@ if (a2hsDismiss) {
   });
 }
 </script>
+
 </body>
 </html>

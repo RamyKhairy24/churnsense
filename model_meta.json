@@ -1,9 +1,28 @@
 {
-  "model_name": "Gradient Boosting",
+  "model_name": "Logistic Regression",
   "features": [
     "Gender",
     "Country",
-    "SubscriptionType"
+    "SubscriptionType",
+    "ContractType",
+    "TenureMonths",
+    "MonthlyCharge",
+    "SupportTickets",
+    "DaysSinceLastLogin",
+    "PaymentFailures"
+  ],
+  "categorical_features": [
+    "Gender",
+    "Country",
+    "SubscriptionType",
+    "ContractType"
+  ],
+  "numeric_features": [
+    "TenureMonths",
+    "MonthlyCharge",
+    "SupportTickets",
+    "DaysSinceLastLogin",
+    "PaymentFailures"
   ],
   "categories": {
     "Gender": [
@@ -22,6 +41,52 @@
       "Basic",
       "Free",
       "Premium"
+    ],
+    "ContractType": [
+      "Annual",
+      "Monthly"
     ]
+  },
+  "numeric_ranges": {
+    "TenureMonths": {
+      "min": 1,
+      "max": 72,
+      "default": 24,
+      "step": 1,
+      "unit": "months",
+      "label": "Tenure"
+    },
+    "MonthlyCharge": {
+      "min": 0,
+      "max": 100,
+      "default": 49,
+      "step": 1,
+      "unit": "$",
+      "label": "Monthly Charge"
+    },
+    "SupportTickets": {
+      "min": 0,
+      "max": 8,
+      "default": 1,
+      "step": 1,
+      "unit": "",
+      "label": "Support Tickets"
+    },
+    "DaysSinceLastLogin": {
+      "min": 0,
+      "max": 365,
+      "default": 14,
+      "step": 1,
+      "unit": "days",
+      "label": "Days Since Login"
+    },
+    "PaymentFailures": {
+      "min": 0,
+      "max": 5,
+      "default": 0,
+      "step": 1,
+      "unit": "",
+      "label": "Payment Failures"
+    }
   }
 }
